@@ -6,37 +6,37 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/vehicle_card"
+        android:id="@+id/trip_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/green_secondary"
+        android:background="@color/tripCardSecondary"
         android:padding="20dp">
 
         <TextView
-            android:id="@+id/text_position"
+            android:id="@+id/cardText1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_marginBottom="10dp"
-            android:background="@color/green_primary"
+            android:background="@color/tripCardPrimary"
             android:gravity="center"
-            android:text="Waiting for Position..."
+            android:text="@string/cardText1"
             android:textAlignment="center"
             android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@+id/text_lineRef"
+            app:layout_constraintBottom_toTopOf="@+id/cardText2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/text_lineRef"
+            android:id="@+id/cardText2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/green_primary"
+            android:background="@color/tripCardPrimary"
             android:gravity="center"
-            android:text="Waiting for lineRef..."
+            android:text="@string/cardText2"
             android:textAlignment="center"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -45,20 +45,20 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/text_progress"
+            android:id="@+id/cardText3"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="3"
             android:layout_marginTop="10dp"
-            android:background="@color/green_primary"
+            android:background="@color/tripCardPrimary"
             android:gravity="center"
-            android:text="Waiting for progress..."
+            android:text="@string/cardText3"
             android:textAlignment="center"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_lineRef" />
+            app:layout_constraintTop_toBottomOf="@+id/cardText2" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

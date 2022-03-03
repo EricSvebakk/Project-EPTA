@@ -3,6 +3,7 @@ package no.tepohi.projectenturpublictransportapp
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
@@ -10,6 +11,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.PagerSnapHelper
 import no.tepohi.projectenturpublictransportapp.databinding.ActivityMainBinding
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.schedule
 import kotlin.math.min
 
 class MainActivity : AppCompatActivity() {
@@ -32,64 +36,72 @@ class MainActivity : AppCompatActivity() {
 
             Log.d("arraylist tag", yours.toString())
 
-            val adapter = ArrayAdapter(
+            val adapter = LimitArrayAdapter(
                 this,
-                android.R.layout.select_dialog_item,
+                android.R.layout.simple_dropdown_item_1line,
                 ArrayList(yours!!.keys),
-//                4
+                4
             )
 
-            binding.editTextFrom.setAdapter(adapter)
-            binding.editTextTo.setAdapter(adapter)
+            binding.tripEditTextFrom.setAdapter(adapter)
+            binding.tripEditTextTo.setAdapter(adapter)
         }
 
 
-        binding.buttonResult.setOnClickListener {
+        binding.tripButtonStartQuery.setOnClickListener {
 
-            val from: String = binding.editTextFrom.text.toString()
-            val to: String = binding.editTextTo.text.toString()
+            binding.tripLoadingCard.visibility = View.VISIBLE
+
+            val from: String = binding.tripEditTextFrom.text.toString()
+            val to: String = binding.tripEditTextTo.text.toString()
 
             if (from != "" && to != "") {
-
-
-
-                viewModel.loadGraphQLData(yours!![from]!!, yours!![to]!!).observe(this) {
+                viewModel.loadTrips(yours!![from]!!, yours!![to]!!).observe(this) {
 
                     Log.d("tag", it.toString())
 
-                    binding.textNumber.text = it.size.toString()
-                    binding.recyclerviewVehicles.adapter = GraphQLAdapter(it)
+                    binding.tripNumberTrips.text = it.size.toString()
+                    binding.tripRecyclerviewTrips.adapter = GraphQLAdapter(it)
+
+                    Timer().schedule(500) {
+                        this@MainActivity.runOnUiThread {
+                            binding.tripLoadingCard.visibility = View.INVISIBLE
+                        }
+                    }
                 }
+            }
+            else {
+                binding.tripLoadingCard.visibility = View.INVISIBLE
             }
 
 
         }
 
-        binding.editTextTo.setOnEditorActionListener { _, actionID: Int, _ ->
-            binding.editTextTo.dismissDropDown()
+        binding.tripEditTextTo.setOnEditorActionListener { _, actionID: Int, _ ->
+            binding.tripEditTextTo.dismissDropDown()
             hideKeyboard()
             actionID == EditorInfo.IME_ACTION_DONE
         }
 
-        binding.editTextFrom.setOnEditorActionListener { _, actionID: Int, _ ->
-            binding.editTextFrom.dismissDropDown()
+        binding.tripEditTextFrom.setOnEditorActionListener { _, actionID: Int, _ ->
+            binding.tripEditTextFrom.dismissDropDown()
             hideKeyboard()
             actionID == EditorInfo.IME_ACTION_DONE
         }
 
-        binding.editTextTo.setOnClickListener {
-            binding.editTextTo.dismissDropDown()
+        binding.tripEditTextTo.setOnClickListener {
+            binding.tripEditTextTo.dismissDropDown()
             hideKeyboard()
 
 
         }
 
-        binding.editTextFrom.setOnClickListener {
-            binding.editTextFrom.dismissDropDown()
+        binding.tripEditTextFrom.setOnClickListener {
+            binding.tripEditTextFrom.dismissDropDown()
             hideKeyboard()
         }
 
-        PagerSnapHelper().attachToRecyclerView(binding.recyclerviewVehicles)
+        PagerSnapHelper().attachToRecyclerView(binding.tripRecyclerviewTrips)
     }
 
     // Hides soft keyboard
@@ -97,35 +109,6 @@ class MainActivity : AppCompatActivity() {
         val view = this.currentFocus
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken,0)
-    }
-
-    fun idk() {
-
-        val output = try {
-            binding.editTextFrom.text.toString()
-        } catch (e: Exception) {
-            println("some error happened: $e")
-            ""
-        }
-
-        viewModel.loadVehicles().observe(this) {
-
-            Log.d("main tag", it.toString())
-            var vehicles: List<Vehicle> = it
-
-            if (output != "") {
-                val condition = "RUT:Line:$output"
-                Log.d("cond tag", condition)
-                vehicles = vehicles.filter { vehicle -> vehicle.lineRef!!.line == condition}
-            }
-
-            vehicles = vehicles.sortedWith(compareBy { vehicle -> vehicle.id }).toMutableList()
-            Log.d("main tag", vehicles.toString())
-
-            binding.textNumber.text = vehicles.size.toString()
-            binding.recyclerviewVehicles.adapter = VehicleAdapter(vehicles)
-        }
-
     }
 }
 

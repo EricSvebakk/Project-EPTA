@@ -13,33 +13,18 @@ import no.tepohi.example.StopsQuery
 class MainActivityViewModel: ViewModel() {
 
     private val dataSource = DataSource()
-
-    private val vehicleData = MutableLiveData<MutableList<Vehicle>>()
     private val graphQLData = MutableLiveData<MutableList<FindTripQuery.TripPattern>>()
     private val stopsData = MutableLiveData<MutableList<StopsQuery.StopPlace?>>()
 
-    fun loadVehicles(): LiveData<MutableList<Vehicle>> {
+    fun loadTrips(from: String, to: String): LiveData<MutableList<FindTripQuery.TripPattern>> {
 
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("load Vehicles tag+", "done!")
-            dataSource.fetchVehicles().also {
-                vehicleData.postValue(it)
-            }
-        }
-        Log.d("load Vehicles tag", "done!")
-
-        return vehicleData
-    }
-
-    fun loadGraphQLData(from: String, to: String): LiveData<MutableList<FindTripQuery.TripPattern>> {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            Log.d("load Vehicles tag+", "done!")
-            dataSource.fetchGraphQLData(from, to).also {
+            Log.d("load trips launch tag", "done!")
+            dataSource.fetchTrips(from, to).also {
                 graphQLData.postValue(it)
             }
         }
-        Log.d("load Vehicles tag", "done!")
+        Log.d("load trips final tag", "done!")
 
         return graphQLData
     }

@@ -3,8 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEnturPublicTransportApp/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEnturPublicTransportApp/app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEnturPublicTransportApp/app/src/main/res/layout/vehicle_element.xml" value="0.2" />
+        <entry key="..\:/Users/Eric/AppData/Local/Android/Sdk/platforms/android-32/data/res/layout/simple_dropdown_item_1line.xml" value="0.25416666666666665" />
       </map>
     </option>
   </component>
