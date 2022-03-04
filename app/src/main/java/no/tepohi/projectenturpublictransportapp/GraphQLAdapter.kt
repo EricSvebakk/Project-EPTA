@@ -32,28 +32,28 @@ class GraphQLAdapter(private val dataset: MutableList<FindTripQuery.TripPattern>
         return ViewHolder(view)
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "SimpleDateFormat")
     override fun onBindViewHolder(holder: ViewHolder, pos: Int) {
 
         val duration = (dataset[pos].duration.toString().toInt() / 60.0).toFloat()
         holder.cardText2.text = "Duration: ${duration.toInt()}min"
 
+        // now time
         val date1 = Date().toString()
-        val date2 = dataset[pos].expectedStartTime.toString()
 
-        var formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sszzzz")
+        // matches trip time format
+        val format = holder.itemView.context.getString(R.string.EnturDateFormat)
+        var formatter = SimpleDateFormat(format)
         val date3 = formatter.parse(dataset[pos].expectedStartTime.toString())
 
-        formatter = SimpleDateFormat("HH:mm")
-//        formatter.timeZone = TimeZone.t TimeZone("GMT+1")
+        // reformats trip time
+        formatter = SimpleDateFormat("HH:mma")
         val date4 = formatter.format(date3)
 
         Log.d("time tag1", date1)
-        Log.d("time tag2", date2)
-        Log.d("time tag3", date3.toString())
         Log.d("time tag4", date4)
 
-        holder.cardText1.text = "Departure: $date2"
+        holder.cardText1.text = "Departure: $date4"
 
         var string = ""
         dataset[pos].legs.forEach {
@@ -65,7 +65,6 @@ class GraphQLAdapter(private val dataset: MutableList<FindTripQuery.TripPattern>
                 val line = it?.line?.id?.split(":")?.get(2)
                 "$mode $line"
             }
-
             string +=  "$method to ${it?.toPlace?.name}\n"
         }
 

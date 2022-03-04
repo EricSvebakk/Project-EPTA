@@ -1,7 +1,16 @@
+
+// added for google maps
+buildscript {
+    dependencies {
+        classpath "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1"
+    }
+}
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id("com.apollographql.apollo3").version("3.1.0")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -82,8 +91,14 @@ dependencies {
 
     // GRAPHQL via APOLLO
     implementation("com.apollographql.apollo3:apollo-runtime:3.1.0")
+
+    // google maps services
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+
 }
 
 apollo {
     packageName.set("no.tepohi.example")
+//    mapScalar("StreetMode", "String")
+    generateOptionalOperationVariables.set(false)
 }

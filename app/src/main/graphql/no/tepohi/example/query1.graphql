@@ -6,16 +6,18 @@ query FindTripQuery($from: String!, $to: String!) {
     to: {
       place: $to
     }
-    numTripPatterns: 3
+    numTripPatterns: 12
   ) {
     tripPatterns {
-      aimedStartTime
       expectedStartTime
       duration
       legs {
         mode
         duration
         distance
+        pointsOnLink {
+          points
+        }
         toPlace {
           name
         }

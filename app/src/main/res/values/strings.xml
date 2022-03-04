@@ -9,4 +9,5 @@
     <string name="tripButtonShowMap">Go To Map</string>
     <string name="tripNumberTrips">0</string>
     <string name="tripTextNumberTrips">Number of Trips:</string>
+    <string name="EnturDateFormat">yyyy-MM-dd\'T\'HH:mm:sszzzz</string>
 </resources>

@@ -11,7 +11,7 @@ class DataSource {
     private val path = "https://api.entur.io/journey-planner/v3/graphql"
     private val apolloClient = ApolloClient.Builder().serverUrl(path).build()
 
-    suspend fun fetchTrips(from: String, to: String): MutableList<FindTripQuery.TripPattern> {
+    suspend fun fetchTrips(from: String, to: String, bike: Boolean): MutableList<FindTripQuery.TripPattern> {
 
         val response = try {
             val query = FindTripQuery(from, to)
