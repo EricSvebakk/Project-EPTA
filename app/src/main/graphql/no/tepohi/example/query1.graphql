@@ -1,4 +1,4 @@
-query FindTripQuery($from: String!, $to: String!) {
+query FindTripQuery($from: String!, $to: String!, $date: DateTime) {
   trip(
     from: {
       place: $from
@@ -7,6 +7,7 @@ query FindTripQuery($from: String!, $to: String!) {
       place: $to
     }
     numTripPatterns: 12
+    dateTime: $date
   ) {
     tripPatterns {
       expectedStartTime

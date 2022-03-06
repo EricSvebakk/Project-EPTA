@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="no.tepohi.projectenturpublictransportapp">
+    package="no.tepohi.projectepta">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -24,11 +24,11 @@
             />
 
         <activity
-            android:name=".MapActivity"
+            android:name="no.tepohi.projectepta.MapActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName="no.tepohi.projectepta.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name="no.tepohi.projectepta.MainActivity"
             android:windowSoftInputMode="adjustNothing"
             android:exported="true">
             <intent-filter>

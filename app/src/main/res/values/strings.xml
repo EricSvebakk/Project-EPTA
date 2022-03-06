@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Project Entur Public Transport App</string>
+    <string name="app_name">Project EPTA</string>
     <string name="cardText1">Waiting for text1...</string>
     <string name="cardText2">Waiting for text2...</string>
     <string name="cardText3">Waiting for text3...</string>
@@ -8,6 +8,6 @@
     <string name="tripButtonStartQuery">Find</string>
     <string name="tripButtonShowMap">Go To Map</string>
     <string name="tripNumberTrips">0</string>
-    <string name="tripTextNumberTrips">Number of Trips:</string>
-    <string name="EnturDateFormat">yyyy-MM-dd\'T\'HH:mm:sszzzz</string>
+    <string name="tripTextNumberTrips">Trips:</string>
+    <string name="EnturDateFormat">yyyy-MM-dd\'T\'kk:mm:ssXXX</string>
 </resources>

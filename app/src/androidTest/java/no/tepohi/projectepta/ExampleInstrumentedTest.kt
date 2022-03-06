@@ -1,4 +1,4 @@
-package no.tepohi.projectenturpublictransportapp
+package no.tepohi.projectepta
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -21,13 +21,14 @@ android {
     }
 
     defaultConfig {
-        applicationId "no.tepohi.projectenturpublictransportapp"
-        minSdk 23
+        applicationId "no.tepohi.projectepta"
+        minSdk 24
         targetSdk 32
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -99,6 +100,5 @@ dependencies {
 
 apollo {
     packageName.set("no.tepohi.example")
-//    mapScalar("StreetMode", "String")
     generateOptionalOperationVariables.set(false)
 }

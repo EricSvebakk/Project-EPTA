@@ -1,4 +1,4 @@
-package no.tepohi.projectenturpublictransportapp
+package no.tepohi.projectepta
 
 import org.junit.Test
 

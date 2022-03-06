@@ -1,4 +1,4 @@
-package no.tepohi.projectenturpublictransportapp
+package no.tepohi.projectepta
 
 import android.util.Xml
 import org.xmlpull.v1.XmlPullParser

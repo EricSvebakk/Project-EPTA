@@ -1,8 +1,6 @@
-package no.tepohi.projectenturpublictransportapp
+package no.tepohi.projectepta
 
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -10,9 +8,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
-import no.tepohi.projectenturpublictransportapp.databinding.ActivityMapBinding
+import no.tepohi.projectepta.R
+import no.tepohi.projectepta.databinding.ActivityMapBinding
 
 class MapActivity: AppCompatActivity(), OnMapReadyCallback {
 
@@ -27,6 +24,28 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback {
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.the_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+//        val legs = viewModel.tripsData.value?.get(0)?.legs
+//
+//        Log.d("tripsdata tag", viewModel.tripsData.value.toString())
+//        Log.d("polyline tag", legs.toString())
+
+//        if (legs != null) {
+//            for (leg in legs) {
+//
+//                val polyline = leg!!.pointsOnLink!!.points.toString()
+//                Log.d("polyline tag", polyline)
+//
+//                val decoded = decode(polyline)
+//                Log.d("polyline tag", decoded.toString())
+//
+//                mMap.addPolyline(
+//                    PolylineOptions()
+//                        .clickable(true)
+//                        .addAll(decoded)
+//                )
+//            }
+//        }
     }
 
     override fun onMapReady(p0: GoogleMap) {
@@ -38,9 +57,9 @@ class MapActivity: AppCompatActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(59.91, 10.74)))
         mMap.moveCamera(CameraUpdateFactory.zoomTo(5.0F))
 
-        viewModel.tripsData.value?.get(0)?.legs?.forEach {
-
-        }
+//        viewModel.tripsData.value?.get(0)?.legs?.forEach {
+//
+//        }
     }
 
     fun decode(polyline: String): List<LatLng> {

@@ -5,137 +5,213 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
-    tools:context=".MainActivity">
+    tools:context="no.tepohi.projectepta.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <AutoCompleteTextView
-            android:id="@+id/tripEditTextFrom"
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/tripEditTextFromHint"
-            android:imeOptions="actionDone"
-            android:inputType="textNoSuggestions"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.213"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.088" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <AutoCompleteTextView
-            android:id="@+id/tripEditTextTo"
+            <AutoCompleteTextView
+                android:id="@+id/tripEditTextFrom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/tripEditTextFromHint"
+                android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.213"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.088" />
+
+            <AutoCompleteTextView
+                android:id="@+id/tripEditTextTo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/tripEditTextToHint"
+                android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
+                app:layout_constraintEnd_toEndOf="@+id/tripEditTextFrom"
+                app:layout_constraintStart_toStartOf="@+id/tripEditTextFrom"
+                app:layout_constraintTop_toBottomOf="@+id/tripEditTextFrom" />
+
+            <Button
+                android:id="@+id/tripButtonStartQuery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tripButtonStartQuery"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tripEditTextTo" />
+
+            <TextView
+                android:id="@+id/tripTextNumberTrips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="20dp"
+                android:text="@string/tripTextNumberTrips"
+                android:textAlignment="textEnd"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/tripButtonStartQuery"
+                app:layout_constraintEnd_toStartOf="@+id/tripNumberTrips"
+                app:layout_constraintTop_toTopOf="@+id/tripButtonStartQuery" />
+
+            <TextView
+                android:id="@+id/trip_timeStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="20dp"
+                android:text="null"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/trip_filter"
+                app:layout_constraintStart_toEndOf="@+id/trip_filter"
+                app:layout_constraintTop_toTopOf="@+id/trip_filter" />
+
+            <TextView
+                android:id="@+id/tripNumberTrips"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:text="@string/tripNumberTrips"
+                android:textAlignment="viewEnd"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/tripTextNumberTrips"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tripTextNumberTrips" />
+
+            <ImageButton
+                android:id="@+id/trip_filter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="20dp"
+                android:contentDescription="FilterIcon"
+                android:onClick="toggleTimePickerDialog"
+                android:src="@drawable/ic_baseline_filter_list_24"
+                app:layout_constraintBottom_toBottomOf="@+id/tripButtonStartQuery"
+                app:layout_constraintStart_toEndOf="@+id/tripButtonStartQuery"
+                app:layout_constraintTop_toTopOf="@+id/tripButtonStartQuery" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tripRecyclerviewTrips"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/tripCardSecondary"
+            android:scrollbars="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/tripButtonShowMap"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/tripLoadingCard"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="@string/tripEditTextToHint"
-            android:imeOptions="actionDone"
-            android:inputType="textNoSuggestions"
-            app:layout_constraintEnd_toEndOf="@+id/tripEditTextFrom"
-            app:layout_constraintStart_toStartOf="@+id/tripEditTextFrom"
-            app:layout_constraintTop_toBottomOf="@+id/tripEditTextFrom" />
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            android:alpha="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/tripRecyclerviewTrips"
+            app:layout_constraintEnd_toEndOf="@+id/tripRecyclerviewTrips"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tripRecyclerviewTrips"
+            app:layout_constraintTop_toTopOf="@+id/tripRecyclerviewTrips"
+            app:layout_constraintVertical_bias="1.0">
+
+            <ProgressBar
+                android:id="@+id/tripLoadingCardProgressbar"
+                style="@style/Widget.MaterialComponents.CircularProgressIndicator"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/tripLoadingCardProgressbar"/>
+        </androidx.cardview.widget.CardView>
 
         <Button
-            android:id="@+id/tripButtonStartQuery"
-            android:layout_width="wrap_content"
+            android:id="@+id/tripButtonShowMap"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/tripButtonStartQuery"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tripEditTextTo" />
-
-        <TextView
-            android:id="@+id/tripTextNumberTrips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingEnd="20dp"
-            android:text="@string/tripTextNumberTrips"
-            android:textAlignment="textEnd"
+            android:text="@string/tripButtonShowMap"
             android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tripButtonStartQuery"
-            app:layout_constraintEnd_toStartOf="@+id/tripNumberTrips"
-            app:layout_constraintTop_toTopOf="@+id/tripButtonStartQuery" />
-
-        <TextView
-            android:id="@+id/tripNumberTrips"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:text="@string/tripNumberTrips"
-            android:textAlignment="viewEnd"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@+id/tripTextNumberTrips"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tripTextNumberTrips" />
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <CheckBox
-            android:id="@+id/tripBikeOnly"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/trip_timePicker_card"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="bike?"
-            app:layout_constraintBottom_toBottomOf="@+id/tripButtonStartQuery"
-            app:layout_constraintStart_toEndOf="@+id/tripButtonStartQuery"
-            app:layout_constraintTop_toTopOf="@+id/tripButtonStartQuery" />
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:background="#aaa"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TimePicker
+                android:id="@+id/trip_timePicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:timePickerMode="spinner"
+                android:background="?android:attr/colorBackground"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:text="done"
+                android:onClick="toggleTimePickerDialog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tripRecyclerviewTrips"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/tripCardSecondary"
-        android:scrollbars="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@+id/tripButtonShowMap"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="1.0" />
-
     <androidx.cardview.widget.CardView
-        android:id="@+id/tripLoadingCard"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="invisible"
+        android:id="@+id/waiting_for_stops"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:alpha="0.5"
-        app:layout_constraintBottom_toBottomOf="@+id/tripRecyclerviewTrips"
-        app:layout_constraintEnd_toEndOf="@+id/tripRecyclerviewTrips"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/tripRecyclerviewTrips"
-        app:layout_constraintTop_toTopOf="@+id/tripRecyclerviewTrips"
-        app:layout_constraintVertical_bias="1.0">
-
-    <ProgressBar
-        android:id="@+id/tripLoadingCardProgressbar"
-        style="@style/Widget.MaterialComponents.CircularProgressIndicator"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        android:indeterminateTint="@color/tripLoadingCardProgressbar"
-        app:layout_constraintBottom_toBottomOf="@+id/tripLoadingCard"
-        app:layout_constraintEnd_toEndOf="@+id/tripLoadingCard"
-        app:layout_constraintStart_toStartOf="@+id/tripLoadingCard"
-        app:layout_constraintTop_toTopOf="@+id/tripLoadingCard" />
-    </androidx.cardview.widget.CardView>
-
-    <Button
-        android:id="@+id/tripButtonShowMap"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/tripButtonShowMap"
-        android:textSize="20sp"
+        android:background="@color/white"
+        android:translationZ="2dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/stopLoadingCardProgressbar"
+            style="@style/Widget.MaterialComponents.CircularProgressIndicator"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/tripLoadingCardProgressbar"/>
+    </androidx.cardview.widget.CardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

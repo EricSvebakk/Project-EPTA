@@ -1,4 +1,4 @@
-package no.tepohi.projectenturpublictransportapp
+package no.tepohi.projectepta
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import no.tepohi.example.FindTripQuery
+import no.tepohi.projectepta.R
 import java.text.SimpleDateFormat
-import java.util.*
 
-class GraphQLAdapter(private val dataset: MutableList<FindTripQuery.TripPattern>): RecyclerView.Adapter<GraphQLAdapter.ViewHolder>() {
+class GraphQLAdapter(private val dataset: List<FindTripQuery.TripPattern>): RecyclerView.Adapter<GraphQLAdapter.ViewHolder>() {
 
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val cardText1: TextView
@@ -38,22 +38,16 @@ class GraphQLAdapter(private val dataset: MutableList<FindTripQuery.TripPattern>
         val duration = (dataset[pos].duration.toString().toInt() / 60.0).toFloat()
         holder.cardText2.text = "Duration: ${duration.toInt()}min"
 
-        // now time
-        val date1 = Date().toString()
-
         // matches trip time format
-        val format = holder.itemView.context.getString(R.string.EnturDateFormat)
-        var formatter = SimpleDateFormat(format)
-        val date3 = formatter.parse(dataset[pos].expectedStartTime.toString())
+        val enturFormat = holder.itemView.context.getString(R.string.EnturDateFormat)
 
-        // reformats trip time
-        formatter = SimpleDateFormat("HH:mma")
-        val date4 = formatter.format(date3)
+        val dateDataset = dataset[pos].expectedStartTime.toString()
+        val dateAsObject = SimpleDateFormat(enturFormat).parse(dateDataset)!!
+        val dateAsString = SimpleDateFormat("kk:mm").format(dateAsObject)
 
-        Log.d("time tag1", date1)
-        Log.d("time tag4", date4)
+        Log.d("time tag4", dateAsString)
 
-        holder.cardText1.text = "Departure: $date4"
+        holder.cardText1.text = "Departure: $dateAsString"
 
         var string = ""
         dataset[pos].legs.forEach {
