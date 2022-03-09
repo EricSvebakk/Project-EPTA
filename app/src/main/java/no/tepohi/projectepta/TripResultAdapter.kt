@@ -8,17 +8,25 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import no.tepohi.example.FindTripQuery
-import no.tepohi.projectepta.R
 import java.text.SimpleDateFormat
 
-class GraphQLAdapter(private val dataset: List<FindTripQuery.TripPattern>): RecyclerView.Adapter<GraphQLAdapter.ViewHolder>() {
+class TripResultAdapter(private val dataset: List<FindTripQuery.TripPattern>): RecyclerView.Adapter<TripResultAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    private lateinit var moicl: View.OnClickListener
+
+    fun setOnItemClickListener(itemClickListener: View.OnClickListener) {
+        moicl = itemClickListener
+    }
+
+    inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val cardText1: TextView
         val cardText2: TextView
         val cardText3: TextView
 
         init {
+            view.tag = this
+            view.setOnClickListener(moicl)
+
             cardText1 = view.findViewById(R.id.cardText1)
             cardText2 = view.findViewById(R.id.cardText2)
             cardText3 = view.findViewById(R.id.cardText3)
@@ -36,7 +44,7 @@ class GraphQLAdapter(private val dataset: List<FindTripQuery.TripPattern>): Recy
     override fun onBindViewHolder(holder: ViewHolder, pos: Int) {
 
         val duration = (dataset[pos].duration.toString().toInt() / 60.0).toFloat()
-        holder.cardText2.text = "Duration: ${duration.toInt()}min"
+        holder.cardText2.text = "${duration.toInt()}min"
 
         // matches trip time format
         val enturFormat = holder.itemView.context.getString(R.string.EnturDateFormat)

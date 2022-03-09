@@ -14,7 +14,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.PagerSnapHelper
-import no.tepohi.example.FindTripQuery
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import no.tepohi.example.FindTripQuery.TripPattern
 import no.tepohi.projectepta.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,7 +28,23 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
 
     private lateinit var tripStops: Map<String, String>
-    private lateinit var tripsALl: List<FindTripQuery.TripPattern>
+    private lateinit var tripsAll: List<TripPattern>
+
+    private var mItemClickListener: View.OnClickListener = View.OnClickListener { view ->
+
+        val viewHolder: RecyclerView.ViewHolder = view.tag as RecyclerView.ViewHolder
+
+        Intent(this, MapActivity::class.java).also { intent ->
+            var points = ""
+
+            tripsAll[viewHolder.absoluteAdapterPosition].legs.forEach { temp ->
+                points += "${temp?.pointsOnLink?.points}\n"
+            }
+
+            intent.putExtra("pointsOnLink", points)
+            startActivity(intent)
+        }
+    }
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,12 +73,6 @@ class MainActivity : AppCompatActivity() {
 
             findTrip(from, to, queryTime, formatter)
         }
-
-        binding.tripButtonShowMap.setOnClickListener {
-            Intent(this, MapActivity::class.java).also {
-                startActivity(it)
-            }
-        }
     }
 
     /**
@@ -84,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             actionID == EditorInfo.IME_ACTION_DONE
         }
 
-        PagerSnapHelper().attachToRecyclerView(binding.tripRecyclerviewTrips)
+//        PagerSnapHelper().attachToRecyclerView(binding.tripRecyclerviewTrips)
     }
 
     /**
@@ -100,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
             val adapter = LimitArrayAdapter(
                 this,
-                R.layout.custom_dropdown_item_1line,
+                android.R.layout.simple_dropdown_item_1line,
                 ArrayList(tripStops.keys),
                 4
             )
@@ -122,7 +134,7 @@ class MainActivity : AppCompatActivity() {
 
             viewModel.loadTrips(tripStops[from]!!, tripStops[to]!!, queryTime).observe(this) { trips ->
 
-                tripsALl = trips
+                tripsAll = trips
                 Log.d("trip-patterns tag", trips.toString())
 
                 var result = trips.sortedWith(compareBy { temp ->
@@ -136,7 +148,11 @@ class MainActivity : AppCompatActivity() {
                 result = if (resultFiltered.size > 0) resultFiltered else result
 
                 binding.tripNumberTrips.text = result.size.toString()
-                binding.tripRecyclerviewTrips.adapter = GraphQLAdapter(result)
+
+                val adapter = TripResultAdapter(result)
+                adapter.setOnItemClickListener(mItemClickListener)
+
+                binding.tripRecyclerviewTrips.adapter = adapter
 
                 binding.tripLoadingCard.visibility = View.INVISIBLE
             }

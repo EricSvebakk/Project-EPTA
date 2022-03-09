@@ -81,10 +81,6 @@ dependencies {
     implementation "io.ktor:ktor-client-core:$ktor_version"
     implementation "io.ktor:ktor-client-android:$ktor_version"
     implementation "io.ktor:ktor-client-serialization:$ktor_version"
-//    implementation "io.ktor:ktor-client-gson:$ktor_version"
-
-    // PagerSnapHelper: Snaps Recyclerview to item-center
-    implementation("androidx.recyclerview:recyclerview:1.2.0-alpha02")
 
     // http functionality? Coroutines
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
@@ -95,6 +91,9 @@ dependencies {
 
     // google maps services
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+
+    // swipeRefreshLayout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
 }
 
