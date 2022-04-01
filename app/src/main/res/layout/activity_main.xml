@@ -107,20 +107,28 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tripRecyclerviewTrips"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/trip_refresh"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
-            android:background="@color/tripCardSecondary"
-            android:scrollbars="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintVertical_bias="1.0">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tripRecyclerviewTrips"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/tripCardSecondary"
+                android:scrollbars="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
         <androidx.cardview.widget.CardView
             android:id="@+id/tripLoadingCard"
@@ -128,11 +136,11 @@
             android:layout_height="0dp"
             android:visibility="invisible"
             android:alpha="0.5"
-            app:layout_constraintBottom_toBottomOf="@+id/tripRecyclerviewTrips"
-            app:layout_constraintEnd_toEndOf="@+id/tripRecyclerviewTrips"
+            app:layout_constraintBottom_toBottomOf="@+id/trip_refresh"
+            app:layout_constraintEnd_toEndOf="@+id/trip_refresh"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/tripRecyclerviewTrips"
-            app:layout_constraintTop_toTopOf="@+id/tripRecyclerviewTrips"
+            app:layout_constraintStart_toStartOf="@+id/trip_refresh"
+            app:layout_constraintTop_toTopOf="@+id/trip_refresh"
             app:layout_constraintVertical_bias="1.0">
 
             <ProgressBar

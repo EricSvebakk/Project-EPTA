@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import no.tepohi.example.FindTripQuery.TripPattern
@@ -22,13 +21,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.min
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainActivityViewModel by viewModels()
 
     private lateinit var tripStops: Map<String, String>
     private lateinit var tripsAll: List<TripPattern>
+    private lateinit var formatter: SimpleDateFormat
+
+    private var queryTime: String = Date().toString()
+    private var from: String = ""
+    private var to: String = ""
 
     private var mItemClickListener: View.OnClickListener = View.OnClickListener { view ->
 
@@ -37,16 +41,16 @@ class MainActivity : AppCompatActivity() {
         Intent(this, MapActivity::class.java).also { intent ->
             var points = ""
 
-            tripsAll[viewHolder.absoluteAdapterPosition].legs.forEach { temp ->
+            tripsAll[viewHolder.adapterPosition].legs.forEach { temp ->
                 points += "${temp?.pointsOnLink?.points}\n"
             }
+            points = points.trim()
 
             intent.putExtra("pointsOnLink", points)
             startActivity(intent)
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -59,19 +63,17 @@ class MainActivity : AppCompatActivity() {
         binding.tripButtonStartQuery.setOnClickListener {
             hideKeyboard()
 
-            val from: String = binding.tripEditTextFrom.text.toString()
-            val to: String = binding.tripEditTextTo.text.toString()
+            from = binding.tripEditTextFrom.text.toString()
+            to = binding.tripEditTextTo.text.toString()
 
-            val formatter = SimpleDateFormat(getString(R.string.EnturDateFormat))
-            val calendarObj = Calendar.getInstance()
+            Calendar.getInstance().also { calendar ->
+                calendar.time = Date()
+                calendar.set(Calendar.HOUR_OF_DAY, binding.tripTimePicker.hour)
+                calendar.set(Calendar.MINUTE, binding.tripTimePicker.minute)
+                queryTime = formatter.format(calendar.time)
+            }
 
-            calendarObj.time = Date()
-            calendarObj.set(Calendar.HOUR_OF_DAY, binding.tripTimePicker.hour)
-            calendarObj.set(Calendar.MINUTE, binding.tripTimePicker.minute)
-
-            val queryTime = formatter.format(calendarObj.time)
-
-            findTrip(from, to, queryTime, formatter)
+            getTrips()
         }
     }
 
@@ -80,7 +82,19 @@ class MainActivity : AppCompatActivity() {
      * hides keyboard on Enter,
      * snaps recyclerview to visible selected-page
      */
+    @SuppressLint("SimpleDateFormat")
     private fun appSetup() {
+
+        formatter = SimpleDateFormat(getString(R.string.EnturDateFormat))
+
+        binding.tripRefresh.setOnRefreshListener(this)
+        binding.tripRefresh.post {
+            Runnable {
+                binding.tripRefresh.isRefreshing = true
+                showTrips()
+                binding.tripRefresh.isRefreshing = false
+            }
+        }
 
         binding.tripTimePicker.setIs24HourView(true)
 
@@ -127,32 +141,14 @@ class MainActivity : AppCompatActivity() {
     /**
      * Queries trip-patterns from Entur GraphQL-endpoint
      */
-    private fun findTrip(from: String, to: String, queryTime: String, formatter: SimpleDateFormat) {
+    private fun getTrips() {
         binding.tripLoadingCard.visibility = View.VISIBLE
 
         if (tripStops.containsKey(from) && tripStops.containsKey(to)) {
+            viewModel.loadTrips(tripStops[from]!!, tripStops[to]!!, queryTime).observe(this) {
+                tripsAll = it
 
-            viewModel.loadTrips(tripStops[from]!!, tripStops[to]!!, queryTime).observe(this) { trips ->
-
-                tripsAll = trips
-                Log.d("trip-patterns tag", trips.toString())
-
-                var result = trips.sortedWith(compareBy { temp ->
-                    formatter.parse(temp.expectedStartTime.toString())
-                })
-
-                val resultFiltered = result.filter { temp ->
-                    formatter.parse(temp.expectedStartTime.toString())!!.after(Date())
-                }
-
-                result = if (resultFiltered.size > 0) resultFiltered else result
-
-                binding.tripNumberTrips.text = result.size.toString()
-
-                val adapter = TripResultAdapter(result)
-                adapter.setOnItemClickListener(mItemClickListener)
-
-                binding.tripRecyclerviewTrips.adapter = adapter
+                showTrips()
 
                 binding.tripLoadingCard.visibility = View.INVISIBLE
             }
@@ -163,6 +159,27 @@ class MainActivity : AppCompatActivity() {
             Log.d("invalid tag", "invalid arguments")
             binding.tripLoadingCard.visibility = View.INVISIBLE
         }
+    }
+
+    private fun showTrips() {
+        Log.d("trip-patterns tag", tripsAll.toString())
+
+        var result = tripsAll.sortedWith(compareBy { temp ->
+            formatter.parse(temp.expectedStartTime.toString())
+        })
+
+        val resultFiltered = result.filter { temp ->
+            formatter.parse(temp.expectedStartTime.toString())!!.after(Date())
+        }
+
+        result = if (resultFiltered.isNotEmpty()) resultFiltered else result
+
+        binding.tripNumberTrips.text = result.size.toString()
+
+        val adapter = TripResultAdapter(result)
+        adapter.setOnItemClickListener(mItemClickListener)
+
+        binding.tripRecyclerviewTrips.adapter = adapter
     }
 
     /**
@@ -190,6 +207,12 @@ class MainActivity : AppCompatActivity() {
         if (binding.tripTimePickerCard.isVisible) binding.tripTimePickerCard.visibility = View.INVISIBLE
         else binding.tripTimePickerCard.visibility = View.VISIBLE
         updateTime()
+    }
+
+    override fun onRefresh() {
+        binding.tripRefresh.isRefreshing = true
+        getTrips()
+        binding.tripRefresh.isRefreshing = false
     }
 }
 
