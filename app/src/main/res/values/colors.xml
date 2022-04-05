@@ -8,7 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="tripCardPrimary">#68A863</color>
+    <color name="tripCardPrimary">#176638</color>
     <color name="tripCardSecondary">#52804F</color>
     <color name="tripLoadingCardProgressbar">#7C7C7C</color>
 </resources>

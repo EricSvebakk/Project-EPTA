@@ -37,3 +37,22 @@ query stopsQuery {
     name
   }
 }
+
+query stopPlacesByBoundary(
+  $minimumLatitude: Float!,
+  $minimumLongitude: Float!,
+  $maximumLatitude: Float!,
+  $maximumLongitude: Float!,
+  $filterByInUse: Boolean) {
+
+  stopPlacesByBbox(
+      minimumLatitude: $minimumLatitude,
+      minimumLongitude: $minimumLongitude,
+      maximumLatitude: $maximumLatitude,
+      maximumLongitude: $maximumLongitude,
+      filterByInUse: $filterByInUse
+    ) {
+    name
+    id
+  }
+}
