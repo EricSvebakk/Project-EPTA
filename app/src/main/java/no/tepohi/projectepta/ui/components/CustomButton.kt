@@ -25,7 +25,7 @@ fun CustomButton(
 
     Button(
         modifier = Modifier
-            .fillMaxHeight()
+//            .fillMaxHeight()
         ,
         colors = colors,
         shape = RoundedCornerShape(Constants.CORNER_RADIUS),

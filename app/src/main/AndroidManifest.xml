@@ -24,10 +24,6 @@
             />
 
         <activity
-            android:name="no.tepohi.projectepta.MapActivity"
-            android:exported="false"
-            android:parentActivityName="no.tepohi.projectepta.MainActivity" />
-        <activity
             android:name="no.tepohi.projectepta.MainActivity"
             android:windowSoftInputMode="adjustNothing"
             android:exported="true">

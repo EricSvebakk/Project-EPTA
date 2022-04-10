@@ -21,33 +21,29 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var stops: List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>
+        viewModel.loadStops()
 
-        viewModel.loadStops().observe(this) {
-            stops = it ?: emptyList()
+        setContent {
 
-            setContent {
+            val navController = rememberNavController()
+            EptaTheme {
 
-                val navController = rememberNavController()
-                EptaTheme {
-
-                    Scaffold(
-                        bottomBar = {
-                            CustomBottomNavigation(
-                                navController = navController,
-                            )
-                        }
-                    ) { padding ->
-                        Box(modifier = Modifier.padding(padding)) {
-                            NavigationGraph(
-                                navController = navController,
-                                stops = stops
-                            )
-                        }
+                Scaffold(
+                    bottomBar = {
+                        CustomBottomNavigation(
+                            navController = navController,
+                        )
+                    }
+                ) { padding ->
+                    Box(modifier = Modifier.padding(padding)) {
+                        NavigationGraph(
+                            navController = navController,
+                            viewModel = viewModel,
+//                                stops = stops,
+                        )
                     }
                 }
             }
-
         }
 
     }

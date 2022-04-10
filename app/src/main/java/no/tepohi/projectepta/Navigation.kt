@@ -13,8 +13,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.tepohi.example.StopPlacesByBoundaryQuery
-import no.tepohi.example.StopsQuery
-import no.tepohi.projectepta.ui.screens.HomeScreen
+import no.tepohi.projectepta.ui.data.MainActivityViewModel
+import no.tepohi.projectepta.ui.screens.DeparturesScreen
+import no.tepohi.projectepta.ui.screens.TripsScreen
 import no.tepohi.projectepta.ui.screens.MapScreen
 
 /**
@@ -22,7 +23,8 @@ import no.tepohi.projectepta.ui.screens.MapScreen
  */
 sealed class BottomNavItem(var title: String, var icon: ImageVector, var screen_route: String){
 
-    object Home : BottomNavItem("Home", Icons.Filled.Search,"home_route")
+    object Trips : BottomNavItem("Trips", Icons.Filled.Search,"journey_route")
+    object Departures : BottomNavItem("Departures", Icons.Filled.TableChart,"departures_route")
     object Map: BottomNavItem("Map", Icons.Filled.Map,"map_route")
 //    object Settings: BottomNavItem("Settings", Icons.Filled.Settings,"settings_route")
 }
@@ -36,7 +38,8 @@ fun CustomBottomNavigation(
 ) {
 
     val items = listOf(
-        BottomNavItem.Home,
+        BottomNavItem.Trips,
+        BottomNavItem.Departures,
         BottomNavItem.Map,
 //        BottomNavItem.Settings
     )
@@ -79,14 +82,18 @@ fun CustomBottomNavigation(
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    stops: List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>
+    viewModel: MainActivityViewModel,
+//    stops: List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>
 ) {
-    NavHost(navController, startDestination = BottomNavItem.Map.screen_route) {
-        composable(BottomNavItem.Home.screen_route) {
-            HomeScreen(navController, stops)
+    NavHost(navController, startDestination = BottomNavItem.Trips.screen_route) {
+        composable(BottomNavItem.Trips.screen_route) {
+            TripsScreen(navController, viewModel)
+        }
+        composable(BottomNavItem.Departures.screen_route) {
+            DeparturesScreen()
         }
         composable(BottomNavItem.Map.screen_route) {
-            MapScreen()
+            MapScreen(viewModel)
         }
     }
 }

@@ -31,7 +31,8 @@ fun <T> CustomAutoComplete(
     label: String,
     items: List<T>,
     dropDownSize: Dp = 120.dp,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    onClearClick: () -> Unit
 ) {
 
 //    println("items: $items")
@@ -72,7 +73,8 @@ fun <T> CustomAutoComplete(
                 view.clearFocus()
             },
             onClearClick = {
-                onValueChange("")
+                onClearClick()
+//                onValueChange("")
                 view.clearFocus()
             },
         )

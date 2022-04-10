@@ -3,6 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/bike_icon.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_bike_24.xml" value="0.1" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_bike_24_boo.xml" value="0.108" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/my_biker.xml" value="0.1" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/mymarker.xml" value="0.1" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/walk_icon.xml" value="0.1535" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/layout/activity_main.xml" value="0.18072916666666666" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/layout/activity_map.xml" value="0.134375" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/layout/custom_dropdown_item_1line.xml" value="0.18072916666666666" />

@@ -1,6 +1,19 @@
 package no.tepohi.projectepta.ui.theme
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+
+
+sealed class Transports(var description: String, var icon: ImageVector, var color: Color){
+    object Foot : Transports("foot", Icons.Filled.DirectionsWalk, Color(94, 200, 231, 151))
+    object Bus : Transports("bus", Icons.Filled.DirectionsBus, Color.Red)
+    object Tram : Transports("tram", Icons.Filled.Tram, Color.Blue)
+    object Metro : Transports("metro", Icons.Filled.DirectionsSubway, Color(194, 78, 0, 255))
+    object Rail : Transports("rail", Icons.Filled.Train, Color(0, 100, 40, 255))
+}
 
 interface Constants {
 
@@ -8,6 +21,9 @@ interface Constants {
         val PADDING_INNER = 10.dp
         val PADDING_OUTER = 20.dp
         val CORNER_RADIUS = 15.dp
+
+        const val ENTUR_FORMAT = "yyyy-MM-dd\'T\'kk:mm:ssXXX"
+        const val TRIP_TIME = "kk:mm"
 
         const val JSON_MAP_DARKMODE = "" +
                 "[\n" +

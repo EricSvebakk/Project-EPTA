@@ -8,42 +8,33 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import no.tepohi.example.FindTripQuery
-import no.tepohi.example.StopPlacesByBoundaryQuery
+import no.tepohi.projectepta.BottomNavItem
 import no.tepohi.projectepta.ui.components.CustomAutoComplete
 import no.tepohi.projectepta.ui.components.CustomButton
-import no.tepohi.projectepta.ui.data.DateTimeViewModel
 import no.tepohi.projectepta.ui.data.MainActivityViewModel
 import no.tepohi.projectepta.ui.theme.Constants
+import no.tepohi.projectepta.ui.theme.Transports
 import no.tepohi.projectepta.ui.theme.testColor
 import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
-fun HomeScreen(
+fun TripsScreen(
     navController: NavController,
-    stops: List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>
+    viewModel: MainActivityViewModel,
 ) {
-
-    val viewModel: MainActivityViewModel = viewModel()
-    val trips = viewModel.tripsData.observeAsState()
-
-//    Log.d("stops-arraylist tag home", stops.toString())
-//    println("trips: ${trips.value}")
 
     Column(
         modifier = Modifier
@@ -55,29 +46,22 @@ fun HomeScreen(
             .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
             .padding(Constants.PADDING_OUTER)
     ) {
-
-        SearchField(stops, viewModel)
-
-        Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
-
-        SearchResult(navController, trips)
+        SearchField(viewModel)
+        Spacer(modifier = Modifier.height(Constants.PADDING_OUTER))
+        SearchResult(navController, viewModel)
     }
-
 }
 
 @Composable
-fun SearchField(
-    stops: List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>,
-    mainViewModel: MainActivityViewModel
-) {
-
-    var fromValue by remember { mutableStateOf("Oslo S") }
-    var toValue by remember { mutableStateOf("Blindern vgs.") }
+fun SearchField(viewModel: MainActivityViewModel) {
 
     val context = LocalContext.current
-    val viewModel: DateTimeViewModel = viewModel()
-    val dateString = viewModel.dateString.observeAsState()
-    val timeString = viewModel.timeString.observeAsState()
+
+    val stops by viewModel.stopsData.observeAsState()
+    val textFieldFrom by viewModel.textFieldFrom.observeAsState()
+    val textFieldTo by viewModel.textFieldTo.observeAsState()
+    val dateString by viewModel.dateString.observeAsState()
+    val timeString by viewModel.timeString.observeAsState()
 
     Column(
         modifier = Modifier
@@ -85,85 +69,86 @@ fun SearchField(
             .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
     ) {
 
-        CustomAutoComplete(
-            value = fromValue,
-            label = "from",
-            items = stops.map { it!!.name },
-            onValueChange = { value -> fromValue = value }
-        )
-        Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
-        CustomAutoComplete(
-            value = toValue,
-            label = "to",
-            items = stops.map { it!!.name },
-            onValueChange = { value -> toValue = value }
-        )
-        Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(47.dp)
-                .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-            ,
-        ) {
+        stops?.let { stopsData ->
 
-            CustomButton(
-                content = "Search",
-                onClick = {
-
-                    if (stops.map { it!!.name }.containsAll(listOf(fromValue, toValue))) {
-
-                        mainViewModel.loadTrips(
-                            stops.filter { it!!.name == fromValue }[0]!!.id,
-                            stops.filter { it!!.name == toValue }[0]!!.id,
-                            viewModel.timeDate.value!!
-                        )
-                    }
-                    else {
-                        Toast.makeText(context,"Invalid arguments", Toast.LENGTH_LONG).show()
-                    }
-
-                },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.primary,
-                ),
-                border = false
+            CustomAutoComplete(
+                value = textFieldFrom ?: "",
+                label = "from",
+                items = stopsData.map { it!!.name },
+                onValueChange = { value -> viewModel.textFieldFrom.postValue(value) },
+                onClearClick = { viewModel.textFieldFrom.postValue("") },
             )
-            Spacer(modifier = Modifier.width(Constants.PADDING_INNER))
-            CustomButton(
-                content = timeString.value!!,
-                onClick = { viewModel.selectTime(context) }
+            Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
+            CustomAutoComplete(
+                value = textFieldTo ?: "",
+                label = "to",
+                items = stopsData.map { it!!.name },
+                onValueChange = { value -> viewModel.textFieldTo.postValue(value) },
+                onClearClick = { viewModel.textFieldTo.postValue("") },
             )
-            Spacer(modifier = Modifier.width(Constants.PADDING_INNER))
-            CustomButton(
-                content = dateString.value!!,
-                onClick = { viewModel.selectDate(context) }
-            )
+            Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(47.dp)
+                    .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                ,
+            ) {
+
+                CustomButton(
+                    content = "Search",
+                    onClick = {
+
+                        if (stopsData.map { it!!.name }.containsAll(listOf(textFieldFrom, textFieldTo))) {
+
+                            viewModel.loadTrips(
+                                stopsData.filter { it!!.name == textFieldFrom }[0]!!.id,
+                                stopsData.filter { it!!.name == textFieldTo }[0]!!.id,
+                                viewModel.dateTime.value!!
+                            )
+                        }
+                        else {
+                            Toast.makeText(context,"Invalid arguments", Toast.LENGTH_LONG).show()
+                        }
+
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colors.primary,
+                    ),
+                    border = false
+                )
+                Spacer(modifier = Modifier.width(Constants.PADDING_INNER))
+                CustomButton(
+                    content = timeString ?: "",
+                    onClick = { viewModel.selectTime(context) }
+                )
+                Spacer(modifier = Modifier.width(Constants.PADDING_INNER))
+                CustomButton(
+                    content = dateString ?: "",
+                    onClick = { viewModel.selectDate(context) }
+                )
+            }
         }
+
     }
 
-}
-
-sealed class EptaTransport(var description: String, var icon: ImageVector, var color: Color){
-    object Foot : EptaTransport("foot", Icons.Filled.DirectionsWalk, Color(94, 200, 231, 151))
-    object Bus : EptaTransport("bus", Icons.Filled.DirectionsBus, Color.Red)
-    object Tram : EptaTransport("tram", Icons.Filled.Tram, Color.Blue)
-    object Metro : EptaTransport("metro", Icons.Filled.DirectionsSubway, Color(194, 78, 0, 255))
-    object Rail : EptaTransport("rail", Icons.Filled.Train, Color(0, 100, 40, 255))
 }
 
 @Composable
 fun SearchResult(
     navController: NavController,
-    trips: State<List<FindTripQuery.TripPattern>?>
+    viewModel: MainActivityViewModel,
 ) {
 
+    val trips by viewModel.tripsData.observeAsState()
+
     val items = listOf(
-        EptaTransport.Foot,
-        EptaTransport.Bus,
-        EptaTransport.Tram,
-        EptaTransport.Metro,
-        EptaTransport.Rail,
+        Transports.Foot,
+        Transports.Bus,
+        Transports.Tram,
+        Transports.Metro,
+        Transports.Rail,
     )
 
     val state = rememberScrollState()
@@ -180,15 +165,26 @@ fun SearchResult(
             .clip(RoundedCornerShape(Constants.CORNER_RADIUS))
     ) {
 
-        if (trips.value?.isNotEmpty() == true) {
+        if (trips?.isNotEmpty() == true) {
 
-            trips.value!!.forEach { tripPattern ->
+            trips!!.forEach { tripPattern ->
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-//                            navController.navigate(BottomNavItem.Map.screen_route)
+                            viewModel.selectedTripData.postValue(tripPattern)
+                            navController.navigate(BottomNavItem.Map.screen_route) {
+
+                                navController.graph.startDestinationRoute?.let { screen_route ->
+                                    popUpTo(screen_route) {
+                                        saveState = true
+                                    }
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+
                         }
                         .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
                         .padding(Constants.PADDING_INNER)
@@ -197,8 +193,8 @@ fun SearchResult(
                 ) {
 
                     val dateAsRaw = tripPattern.expectedStartTime.toString()
-                    val dateAsObject = SimpleDateFormat("yyyy-MM-dd\'T\'kk:mm:ssXXX").parse(dateAsRaw)!!
-                    val dateAsString = SimpleDateFormat("kk:mm").format(dateAsObject)
+                    val dateAsObject = SimpleDateFormat(Constants.ENTUR_FORMAT, Locale.getDefault()).parse(dateAsRaw)!!
+                    val dateAsString = SimpleDateFormat(Constants.TRIP_TIME, Locale.getDefault()).format(dateAsObject)
                     val duration = (tripPattern.duration.toString().toInt() / 60.0).toInt().toString()
 
                     Column(
@@ -224,7 +220,11 @@ fun SearchResult(
 
                             Row(
                                 modifier = Modifier
-                                    .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                                    .border(
+                                        2.dp,
+                                        testColor,
+                                        RoundedCornerShape(Constants.CORNER_RADIUS)
+                                    )
                                     .padding(5.dp)
                                 ,
                                 verticalAlignment = Alignment.CenterVertically
@@ -233,12 +233,16 @@ fun SearchResult(
                                 items.forEach { item ->
                                     if (item.description == leg?.mode.toString()) {
 
-                                        val modeFoot = item.description != EptaTransport.Foot.description
+                                        val modeFoot = item.description != Transports.Foot.description
 
                                         Row(
                                             modifier = Modifier
-                                                .width(55.dp)
-                                                .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                                                .width(68.dp)
+                                                .border(
+                                                    2.dp,
+                                                    testColor,
+                                                    RoundedCornerShape(Constants.CORNER_RADIUS)
+                                                )
                                                 .background(item.color, RoundedCornerShape(4.dp))
                                                 .padding(1.dp)
                                             ,
@@ -263,7 +267,11 @@ fun SearchResult(
                                 Spacer(modifier = Modifier.width(Constants.PADDING_INNER))
                                 Text(
                                     modifier = Modifier
-                                        .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                                        .border(
+                                            2.dp,
+                                            testColor,
+                                            RoundedCornerShape(Constants.CORNER_RADIUS)
+                                        )
                                         .padding(2.dp)
                                     ,
                                     text = "to ${leg?.toPlace?.name}"
