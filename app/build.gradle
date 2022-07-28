@@ -136,6 +136,14 @@ dependencies {
     def nav_version = "2.4.1"
     implementation "androidx.navigation:navigation-compose:$nav_version"
 
+    // Googles Places SDK
+    implementation 'com.google.android.libraries.places:places:2.6.0'
+
+    // gson+fuel
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
+    implementation 'com.github.kittinunf.fuel:fuel-coroutines:2.3.1'
+
     // Integration with activities
     // implementation 'androidx.activity:activity-compose:1.4.0'
 

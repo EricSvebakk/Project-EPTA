@@ -12,9 +12,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import no.tepohi.example.StopPlacesByBoundaryQuery
-import no.tepohi.projectepta.ui.data.MainActivityViewModel
+import no.tepohi.projectepta.ui.viewmodels.MainActivityViewModel
+import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.screens.DeparturesScreen
+import no.tepohi.projectepta.ui.screens.TravelScreen
 import no.tepohi.projectepta.ui.screens.TripsScreen
 import no.tepohi.projectepta.ui.screens.MapScreen
 
@@ -27,6 +28,7 @@ sealed class BottomNavItem(var title: String, var icon: ImageVector, var screen_
     object Departures : BottomNavItem("Departures", Icons.Filled.TableChart,"departures_route")
     object Map: BottomNavItem("Map", Icons.Filled.Map,"map_route")
 //    object Settings: BottomNavItem("Settings", Icons.Filled.Settings,"settings_route")
+    object Map_New: BottomNavItem("Map_new", Icons.Filled.Map, "map_new_route")
 }
 
 /**
@@ -38,9 +40,10 @@ fun CustomBottomNavigation(
 ) {
 
     val items = listOf(
-        BottomNavItem.Trips,
+        BottomNavItem.Map_New,
         BottomNavItem.Departures,
-        BottomNavItem.Map,
+//        BottomNavItem.Map,
+//        BottomNavItem.Trips,
 //        BottomNavItem.Settings
     )
 
@@ -60,15 +63,17 @@ fun CustomBottomNavigation(
                 alwaysShowLabel = true,
                 selected = currentRoute == item.screen_route,
                 onClick = {
-                    navController.navigate(item.screen_route) {
+                    if (currentRoute != item.screen_route) {
+                        navController.navigate(item.screen_route) {
 
-                        navController.graph.startDestinationRoute?.let { screen_route ->
-                            popUpTo(screen_route) {
-                                saveState = true
+                            navController.graph.startDestinationRoute?.let { screen_route ->
+                                popUpTo(screen_route) {
+                                    saveState = true
+                                }
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
                 }
             )
@@ -82,18 +87,30 @@ fun CustomBottomNavigation(
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    viewModel: MainActivityViewModel,
-//    stops: List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>
+    mainActivityViewModel: MainActivityViewModel,
+    searchViewModel: SearchViewModel,
 ) {
-    NavHost(navController, startDestination = BottomNavItem.Trips.screen_route) {
+    NavHost(navController, startDestination = BottomNavItem.Departures.screen_route) {
+        composable(BottomNavItem.Map_New.screen_route) {
+            TravelScreen(
+                mainActivityViewModel = mainActivityViewModel,
+                searchViewModel = searchViewModel,
+            )
+        }
         composable(BottomNavItem.Trips.screen_route) {
-            TripsScreen(navController, viewModel)
+            TripsScreen(
+                navController = navController,
+                viewModel = mainActivityViewModel
+            )
         }
         composable(BottomNavItem.Departures.screen_route) {
-            DeparturesScreen()
+            DeparturesScreen(
+                mainActivityViewModel = mainActivityViewModel,
+                searchViewModel = searchViewModel,
+            )
         }
         composable(BottomNavItem.Map.screen_route) {
-            MapScreen(viewModel)
+            MapScreen(mainActivityViewModel)
         }
     }
 }

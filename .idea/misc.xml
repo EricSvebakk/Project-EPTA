@@ -4,8 +4,25 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/bike_icon.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/end_flag.xml" value="0.1" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_bike_24.xml" value="0.1" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_bike_24_boo.xml" value="0.108" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_bus_24.xml" value="0.1" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_metro_24.xml" value="0.1" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_train_24.xml" value="0.1" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_tram_24.xml" value="0.1" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/ic_baseline_directions_walk_24.xml" value="0.1" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_map_bus.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_map_bus_36.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_map_end_36.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_map_metro_36.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_map_tram_36.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_map_walk.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_map_walk_36.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_table_bus_24.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_table_train_24_1.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_table_train_36.xml" value="0.1535" />
+        <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/icon_walk.xml" value="0.1545" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/my_biker.xml" value="0.1" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/mymarker.xml" value="0.1" />
         <entry key="..\:/Users/Eric/AndroidStudioProjects/ProjectEPTA/app/src/main/res/drawable/walk_icon.xml" value="0.1535" />

@@ -1,7 +1,6 @@
 package no.tepohi.projectepta
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -10,18 +9,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import no.tepohi.example.StopPlacesByBoundaryQuery
-import no.tepohi.projectepta.ui.data.MainActivityViewModel
+import no.tepohi.projectepta.ui.viewmodels.MainActivityViewModel
+import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.theme.EptaTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainActivityViewModel by viewModels()
+    private val mainActivityViewModel: MainActivityViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.loadStops()
+//        searchViewModel.mavm = mainActivityViewModel
+        mainActivityViewModel.loadStops()
 
         setContent {
 
@@ -38,8 +39,9 @@ class MainActivity : ComponentActivity() {
                     Box(modifier = Modifier.padding(padding)) {
                         NavigationGraph(
                             navController = navController,
-                            viewModel = viewModel,
-//                                stops = stops,
+                            mainActivityViewModel = mainActivityViewModel,
+                            searchViewModel = searchViewModel,
+    //                                stops = stops,
                         )
                     }
                 }
