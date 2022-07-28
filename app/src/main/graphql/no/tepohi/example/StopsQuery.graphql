@@ -1,0 +1,6 @@
+query StopsQuery {
+  stopPlaces {
+    id
+    name
+  }
+}

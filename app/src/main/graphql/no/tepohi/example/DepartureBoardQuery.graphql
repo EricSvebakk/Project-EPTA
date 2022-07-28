@@ -1,0 +1,24 @@
+query DepartureBoardQuery(
+  $stopPlaceId: String!,
+  $numberOfDepartures: Int
+  ) {
+  stopPlace(id: $stopPlaceId) {
+    estimatedCalls(numberOfDepartures: $numberOfDepartures) {
+      aimedArrivalTime
+      expectedArrivalTime
+      serviceJourney {
+        journeyPattern {
+          line {
+            id
+            name
+            transportMode
+            publicCode
+          }
+          pointsOnLink {
+            points
+          }
+        }
+      }
+    }
+  }
+}

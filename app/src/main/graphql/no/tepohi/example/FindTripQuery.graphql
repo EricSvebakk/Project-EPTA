@@ -1,0 +1,45 @@
+query FindTripQuery(
+  $fromLat: Float!,
+  $fromLon: Float!,
+  $toLat: Float!,
+  $toLon: Float!,
+  $date: DateTime
+) {
+  trip(
+    from: {
+      coordinates: {
+        latitude: $fromLat,
+        longitude: $fromLon
+      }
+    }
+    to: {
+      coordinates: {
+        latitude: $toLat,
+        longitude: $toLon
+      }
+    }
+    numTripPatterns: 12
+    dateTime: $date
+  ) {
+    tripPatterns {
+      expectedStartTime
+      duration
+      legs {
+        mode
+        duration
+        distance
+        pointsOnLink {
+          points
+        }
+        toPlace {
+          name
+        }
+        line {
+          name
+          id
+          publicCode
+        }
+      }
+    }
+  }
+}
