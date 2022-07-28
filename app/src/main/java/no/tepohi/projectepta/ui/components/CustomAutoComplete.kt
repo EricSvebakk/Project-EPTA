@@ -5,78 +5,119 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.android.libraries.places.api.model.AutocompletePrediction
 import no.tepohi.projectepta.ui.theme.Constants
+import no.tepohi.projectepta.ui.theme.customTextFieldColors
 
 @Composable
-fun <T> CustomAutoComplete(
+fun CustomAutoComplete(
     value: String,
     label: String,
-    items: List<T>,
-    dropDownSize: Dp = 120.dp,
+    items: List<AutocompletePrediction>,
+    dropDownSize: Dp,
+    focusRequester: FocusRequester,
+    nextFocusRequester: FocusRequester? = null,
+    interactionSource: MutableInteractionSource = MutableInteractionSource(),
     onValueChange: (String) -> Unit,
-    onClearClick: () -> Unit
+    onDoneAction: (AutocompletePrediction) -> Unit,
+    trailingIcon: @Composable () -> Unit,
 ) {
 
-//    println("items: $items")
+    val borderColor = customTextFieldColors().placeholderColor(enabled = true).value
 
+    val view = LocalView.current
+    val state = rememberScrollState()
+
+    var bottomBorderRadius by remember { mutableStateOf(Constants.CORNER_RADIUS) }
     var itemsFiltered by remember { mutableStateOf(items) }
     var isSearching by remember { mutableStateOf(false) }
-    val view = LocalView.current
-
-    val state = rememberScrollState()
 
     itemsFiltered = items.autoCompleteFilter(value)
 
     Column(
         modifier = Modifier
             .border(
-                2.dp,
-                MaterialTheme.colors.primary,
-                RoundedCornerShape(Constants.CORNER_RADIUS)
+                width = 2.dp,
+                color = MaterialTheme.colors.onBackground,
+                shape = RoundedCornerShape(Constants.CORNER_RADIUS)
             )
     ) {
 
-        CustomTextField(
+        TextField(
             value = value,
-            label = label,
+            label = { Text(text = label, color = borderColor) },
+            colors = customTextFieldColors(),
+            singleLine = true,
+            interactionSource = interactionSource,
+            shape = RoundedCornerShape(
+                topStart = Constants.CORNER_RADIUS,
+                topEnd = Constants.CORNER_RADIUS,
+                bottomStart = bottomBorderRadius,
+                bottomEnd = bottomBorderRadius
+            ),
             onValueChange = { result ->
                 onValueChange(result)
+
                 itemsFiltered = if (result.isEmpty()) {
                     items
                 } else {
                     items.autoCompleteFilter(value)
                 }
             },
-            onFocusChanged = { state ->
-                isSearching = state.isFocused
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Text
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (itemsFiltered.isNotEmpty()) {
+                        onValueChange(itemsFiltered[0].getPrimaryText(null).toString())
+                        onDoneAction(itemsFiltered[0])
+                    }
+                    if (nextFocusRequester != null) {
+                        nextFocusRequester.requestFocus()
+                    } else {
+                        view.clearFocus()
+                    }
+                }
+            ),
+            trailingIcon = {
+                trailingIcon()
             },
-            onDoneActionClick = {
-                onValueChange(itemsFiltered[0].toString())
-                view.clearFocus()
-            },
-            onClearClick = {
-                onClearClick()
-//                onValueChange("")
-                view.clearFocus()
-            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { state ->
+                    isSearching = state.isFocused
+                    bottomBorderRadius = if (state.isFocused) { 0.dp } else { Constants.CORNER_RADIUS }
+                }
+                .focusRequester(focusRequester)
         )
 
         AnimatedVisibility(
@@ -90,7 +131,7 @@ fun <T> CustomAutoComplete(
                         topStart = 0.dp,
                         topEnd = 0.dp,
                         bottomStart = Constants.CORNER_RADIUS,
-                        bottomEnd = Constants.CORNER_RADIUS
+                        bottomEnd = Constants.CORNER_RADIUS,
                     )
                 )
         ) {
@@ -112,28 +153,15 @@ fun <T> CustomAutoComplete(
                             .padding(Constants.PADDING_INNER)
                     )
                 }
-//                if (itemsFiltered.isNotEmpty()) {
-//                    for (i in 0..(if (itemsFiltered.size-1 < 5) itemsFiltered.size-1 else 5) ) {
-//                        Text(
-//                            text = itemsFiltered[i].toString(),
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .clickable {
-//                                    onValueChange(itemsFiltered[i].toString())
-//                                    view.clearFocus()
-//                                }
-//                                .padding(Constants.PADDING_OUTER)
-//                        )
-//                        Divider()
-//                    }
-//                }
+
                 itemsFiltered.forEach { content ->
                     Text(
-                        text = content.toString(),
+                        text = content.getPrimaryText(null).toString(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                onValueChange(content.toString())
+                                onValueChange(content.getPrimaryText(null).toString())
+                                onDoneAction(content)
                                 view.clearFocus()
                             }
                             .padding(Constants.PADDING_INNER)
@@ -149,14 +177,14 @@ fun <T> CustomAutoComplete(
 
 }
 
-fun <T> List<T>.autoCompleteFilter(query: String): List<T> {
+private fun List<AutocompletePrediction>.autoCompleteFilter(query: String): List<AutocompletePrediction> {
+
     return if (query.isBlank()) {
-        emptyList()
-
+        this
     } else {
-        this.filter { text: T ->
+        this.filter { text: AutocompletePrediction ->
 
-            text.toString().toLowerCase(Locale.current)
+            text.getPrimaryText(null).toString().toLowerCase(Locale.current)
                 .startsWith(query.toLowerCase(Locale.current))
         }
     }

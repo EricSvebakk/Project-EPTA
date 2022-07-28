@@ -1,29 +1,150 @@
 package no.tepohi.projectepta.ui.theme
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.LatLng
+import no.tepohi.projectepta.R
 
 
-sealed class Transports(var description: String, var icon: ImageVector, var color: Color){
-    object Foot : Transports("foot", Icons.Filled.DirectionsWalk, Color(94, 200, 231, 151))
-    object Bus : Transports("bus", Icons.Filled.DirectionsBus, Color.Red)
-    object Tram : Transports("tram", Icons.Filled.Tram, Color.Blue)
-    object Metro : Transports("metro", Icons.Filled.DirectionsSubway, Color(194, 78, 0, 255))
-    object Rail : Transports("rail", Icons.Filled.Train, Color(0, 100, 40, 255))
+sealed class Transports(var mode: String, var iconTableId: Int, var iconMapId: Int, var color: Color){
+
+    object Foot : Transports(
+        mode = "foot",
+        iconTableId = R.drawable.icon_table_walk_24,
+        iconMapId = R.drawable.icon_map_walk_36,
+        color = Color(37, 195, 241, 151),
+    )
+    object Bus : Transports(
+        mode = "bus",
+        iconTableId = R.drawable.icon_table_bus_24,
+        iconMapId = R.drawable.icon_map_bus_36,
+        color = Color(196, 26, 74, 255),
+    )
+    object Tram : Transports(
+        mode = "tram",
+        iconTableId = R.drawable.icon_table_tram_24,
+        iconMapId = R.drawable.icon_map_tram_36,
+        color = Color(3, 169, 244, 255),
+    )
+    object Metro : Transports(
+        mode = "metro",
+        iconTableId = R.drawable.icon_table_metro_24,
+        iconMapId = R.drawable.icon_map_metro_36,
+        color = Color(221, 111, 38, 255),
+    )
+    object Rail : Transports(
+        mode = "rail",
+        iconTableId = R.drawable.icon_table_train_24,
+        iconMapId = R.drawable.icon_map_train_36,
+        color = Color(20, 162, 77, 255),
+    )
 }
 
 interface Constants {
 
     companion object {
         val PADDING_INNER = 10.dp
-        val PADDING_OUTER = 20.dp
+        val PADDING_OUTER = 10.dp
         val CORNER_RADIUS = 15.dp
 
         const val ENTUR_FORMAT = "yyyy-MM-dd\'T\'kk:mm:ssXXX"
         const val TRIP_TIME = "kk:mm"
+
+        val MAP_BOUNDS_SW = LatLng(59.809, 10.456)
+        val MAP_BOUNDS_NE = LatLng(60.136, 10.954)
+
+//        fun Modifier.moveFocus(
+//            focusRequester: FocusRequester? = null,
+//            nextFocusRequester: FocusRequester? = null,
+//        ) = composed {
+//            if (focusRequester != null && nextFocusRequester != null) {
+//                this.focusOrder(focusRequester) {
+//                    nextFocusRequester.requestFocus()
+//                }
+//            }
+//            else if (focusRequester != null && nextFocusRequester == null) {
+//                this.focusOrder(focusRequester)
+//            }
+//            else {
+//                this
+//            }
+//        }
+
+        const val JSON_MAP = "" +
+                "[\n" +
+                "  {\n" +
+                "    \"featureType\": \"administrative.land_parcel\",\n" +
+                "    \"elementType\": \"labels\",\n" +
+                "    \"stylers\": [\n" +
+                "      {\n" +
+                "        \"visibility\": \"off\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"featureType\": \"poi\",\n" +
+                "    \"elementType\": \"labels.text\",\n" +
+                "    \"stylers\": [\n" +
+                "      {\n" +
+                "        \"visibility\": \"off\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"featureType\": \"poi.attraction\",\n" +
+                "    \"stylers\": [\n" +
+                "      {\n" +
+                "        \"visibility\": \"off\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"featureType\": \"poi.business\",\n" +
+                "    \"stylers\": [\n" +
+                "      {\n" +
+                "        \"visibility\": \"off\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"featureType\": \"road.local\",\n" +
+                "    \"elementType\": \"labels\",\n" +
+                "    \"stylers\": [\n" +
+                "      {\n" +
+                "        \"visibility\": \"off\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"featureType\": \"transit.line\",\n" +
+                "    \"elementType\": \"geometry\",\n" +
+                "    \"stylers\": [\n" +
+                "      {\n" +
+                "        \"color\": \"#bc2e0b\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"visibility\": \"off\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"weight\": 4\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"featureType\": \"transit.station\",\n" +
+                "    \"stylers\": [\n" +
+                "      {\n" +
+                "        \"visibility\": \"off\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "]"
 
         const val JSON_MAP_DARKMODE = "" +
                 "[\n" +
