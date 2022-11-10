@@ -12,23 +12,21 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import no.tepohi.projectepta.ui.viewmodels.MainActivityViewModel
+import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
 import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.screens.DeparturesScreen
+import no.tepohi.projectepta.ui.screens.SettingsScreen
 import no.tepohi.projectepta.ui.screens.TravelScreen
-import no.tepohi.projectepta.ui.screens.TripsScreen
-import no.tepohi.projectepta.ui.screens.MapScreen
+import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
 
 /**
  * Determines items to be included in navbar
  */
 sealed class BottomNavItem(var title: String, var icon: ImageVector, var screen_route: String){
 
-    object Trips : BottomNavItem("Trips", Icons.Filled.Search,"journey_route")
     object Departures : BottomNavItem("Departures", Icons.Filled.TableChart,"departures_route")
-    object Map: BottomNavItem("Map", Icons.Filled.Map,"map_route")
-//    object Settings: BottomNavItem("Settings", Icons.Filled.Settings,"settings_route")
-    object Map_New: BottomNavItem("Map_new", Icons.Filled.Map, "map_new_route")
+    object Travel: BottomNavItem("Travel", Icons.Filled.Map, "travel_route")
+    object Settings: BottomNavItem("Settings", Icons.Filled.Settings,"settings_route")
 }
 
 /**
@@ -40,11 +38,9 @@ fun CustomBottomNavigation(
 ) {
 
     val items = listOf(
-        BottomNavItem.Map_New,
+        BottomNavItem.Travel,
         BottomNavItem.Departures,
-//        BottomNavItem.Map,
-//        BottomNavItem.Trips,
-//        BottomNavItem.Settings
+        BottomNavItem.Settings
     )
 
     BottomNavigation(
@@ -87,30 +83,31 @@ fun CustomBottomNavigation(
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    mainActivityViewModel: MainActivityViewModel,
+    enturViewModel: EnturViewModel,
     searchViewModel: SearchViewModel,
+    settingsViewModel: SettingsViewModel,
 ) {
-    NavHost(navController, startDestination = BottomNavItem.Departures.screen_route) {
-        composable(BottomNavItem.Map_New.screen_route) {
+    NavHost(navController, startDestination = BottomNavItem.Travel.screen_route) {
+        composable(BottomNavItem.Travel.screen_route) {
             TravelScreen(
-                mainActivityViewModel = mainActivityViewModel,
+                enturViewModel = enturViewModel,
                 searchViewModel = searchViewModel,
-            )
-        }
-        composable(BottomNavItem.Trips.screen_route) {
-            TripsScreen(
-                navController = navController,
-                viewModel = mainActivityViewModel
+                settingsViewModel = settingsViewModel,
             )
         }
         composable(BottomNavItem.Departures.screen_route) {
             DeparturesScreen(
-                mainActivityViewModel = mainActivityViewModel,
+                enturViewModel = enturViewModel,
                 searchViewModel = searchViewModel,
+                settingsViewModel = settingsViewModel,
             )
         }
-        composable(BottomNavItem.Map.screen_route) {
-            MapScreen(mainActivityViewModel)
+        composable(BottomNavItem.Settings.screen_route) {
+            SettingsScreen(
+                enturViewModel = enturViewModel,
+                searchViewModel = searchViewModel,
+                settingsViewModel = settingsViewModel,
+            )
         }
     }
 }

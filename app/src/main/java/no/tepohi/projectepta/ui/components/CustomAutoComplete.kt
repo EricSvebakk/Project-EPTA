@@ -1,24 +1,21 @@
 package no.tepohi.projectepta.ui.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,28 +23,34 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.android.libraries.places.api.model.AutocompletePrediction
+import no.tepohi.projectepta.ui.sources.StopData
 import no.tepohi.projectepta.ui.theme.Constants
 import no.tepohi.projectepta.ui.theme.customTextFieldColors
+import no.tepohi.projectepta.ui.theme.testColor
 
 @Composable
 fun CustomAutoComplete(
     value: String,
     label: String,
-    items: List<AutocompletePrediction>,
-    dropDownSize: Dp,
+    textSize: TextUnit = 14.sp,
+    dropdownItems: List<StopData>,
+    dropdownHeight: Dp = 180.dp,
+    onValueChange: (String) -> Unit,
+    onDoneAction: (StopData) -> Unit,
     focusRequester: FocusRequester,
     nextFocusRequester: FocusRequester? = null,
     interactionSource: MutableInteractionSource = MutableInteractionSource(),
-    onValueChange: (String) -> Unit,
-    onDoneAction: (AutocompletePrediction) -> Unit,
-    trailingIcon: @Composable () -> Unit,
+//    trailingIcon: @Composable () -> Unit,
 ) {
 
     val borderColor = customTextFieldColors().placeholderColor(enabled = true).value
@@ -55,40 +58,48 @@ fun CustomAutoComplete(
     val view = LocalView.current
     val state = rememberScrollState()
 
-    var bottomBorderRadius by remember { mutableStateOf(Constants.CORNER_RADIUS) }
-    var itemsFiltered by remember { mutableStateOf(items) }
+    var itemsFiltered by remember { mutableStateOf(dropdownItems) }
     var isSearching by remember { mutableStateOf(false) }
 
-    itemsFiltered = items.autoCompleteFilter(value)
+    itemsFiltered = dropdownItems.autoCompleteFilter(value)
 
     Column(
         modifier = Modifier
             .border(
-                width = 2.dp,
+                width = 1.5.dp,
                 color = MaterialTheme.colors.onBackground,
                 shape = RoundedCornerShape(Constants.CORNER_RADIUS)
             )
+            .background(
+                color = MaterialTheme.colors.background,
+                shape = RoundedCornerShape(Constants.CORNER_RADIUS)
+            )
+            .clip(RoundedCornerShape(Constants.CORNER_RADIUS))
     ) {
+
+        if (view.hasFocus()) {
+            BackHandler(enabled = true) {
+                view.clearFocus()
+            }
+        }
 
         TextField(
             value = value,
-            label = { Text(text = label, color = borderColor) },
+            placeholder = { Text(text = label, color = borderColor, fontSize = textSize) },
             colors = customTextFieldColors(),
             singleLine = true,
             interactionSource = interactionSource,
-            shape = RoundedCornerShape(
-                topStart = Constants.CORNER_RADIUS,
-                topEnd = Constants.CORNER_RADIUS,
-                bottomStart = bottomBorderRadius,
-                bottomEnd = bottomBorderRadius
+            textStyle = TextStyle(
+                fontSize = textSize
             ),
+            shape = RoundedCornerShape(Constants.CORNER_RADIUS),
             onValueChange = { result ->
                 onValueChange(result)
 
                 itemsFiltered = if (result.isEmpty()) {
-                    items
+                    dropdownItems
                 } else {
-                    items.autoCompleteFilter(value)
+                    dropdownItems.autoCompleteFilter(value)
                 }
             },
             keyboardOptions = KeyboardOptions(
@@ -98,7 +109,8 @@ fun CustomAutoComplete(
             keyboardActions = KeyboardActions(
                 onDone = {
                     if (itemsFiltered.isNotEmpty()) {
-                        onValueChange(itemsFiltered[0].getPrimaryText(null).toString())
+//                        onValueChange(itemsFiltered[0].getPrimaryText(null).toString())
+                        onValueChange(itemsFiltered[0].name)
                         onDoneAction(itemsFiltered[0])
                     }
                     if (nextFocusRequester != null) {
@@ -106,24 +118,49 @@ fun CustomAutoComplete(
                     } else {
                         view.clearFocus()
                     }
+                },
+                onPrevious = {
+                    view.clearFocus()
                 }
             ),
             trailingIcon = {
-                trailingIcon()
+                if (value != "") {
+                    IconButton(
+                        content = {
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = "Clear",
+                                tint = MaterialTheme.colors.primary
+                            )
+                        },
+                        onClick = {
+//                            view.clearFocus()
+                            onValueChange("")
+//                            enturViewModel.tripsData.postValue(emptyList())
+//                            settingsViewModel.showTripsData.postValue(false)
+                        },
+//                        modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                    )
+                }
+//                trailingIcon()
             },
             modifier = Modifier
                 .fillMaxWidth()
+                .height(50.dp)
                 .onFocusChanged { state ->
                     isSearching = state.isFocused
-                    bottomBorderRadius = if (state.isFocused) { 0.dp } else { Constants.CORNER_RADIUS }
                 }
                 .focusRequester(focusRequester)
         )
+
+        Divider()
 
         AnimatedVisibility(
             visible = isSearching,
             enter = expandVertically(),
             exit = shrinkVertically(),
+//            enter = expandVertically(animationSpec = tween(2000)),
+//            exit = shrinkVertically(animationSpec = tween(2000)),
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(
@@ -136,37 +173,46 @@ fun CustomAutoComplete(
                 )
         ) {
 
-            Divider()
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(dropDownSize)
+                    .height(dropdownHeight)
                     .verticalScroll(state)
             ) {
 
                 if (itemsFiltered.isEmpty() && value.isNotEmpty()) {
                     Text(
                         text = "no results",
+                        fontSize = textSize,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(Constants.PADDING_INNER)
                     )
                 }
 
-                itemsFiltered.forEach { content ->
-                    Text(
-                        text = content.getPrimaryText(null).toString(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                onValueChange(content.getPrimaryText(null).toString())
-                                onDoneAction(content)
-                                view.clearFocus()
-                            }
-                            .padding(Constants.PADDING_INNER)
-                    )
-                    Divider()
+                if (value != "") {
+                    itemsFiltered.forEach { content ->
+                        Text(
+//                            text = content.getPrimaryText(null).toString(),
+                            text = content.name,
+                            fontSize = textSize,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onValueChange(
+                                        content
+                                            .name
+//                                            .getPrimaryText(null)
+//                                            .toString()
+                                    )
+                                    onDoneAction(content)
+                                    view.clearFocus()
+                                }
+                                .padding(Constants.PADDING_INNER)
+                        )
+                        Divider()
+                    }
                 }
             }
 
@@ -177,15 +223,18 @@ fun CustomAutoComplete(
 
 }
 
-private fun List<AutocompletePrediction>.autoCompleteFilter(query: String): List<AutocompletePrediction> {
+private fun List<StopData>.autoCompleteFilter(query: String): List<StopData> {
 
     return if (query.isBlank()) {
         this
     } else {
-        this.filter { text: AutocompletePrediction ->
+        this.filter { text: StopData ->
 
-            text.getPrimaryText(null).toString().toLowerCase(Locale.current)
+            text.name.toLowerCase(Locale.current)
                 .startsWith(query.toLowerCase(Locale.current))
+
+//            text.getPrimaryText(null).toString().toLowerCase(Locale.current)
+//                .startsWith(query.toLowerCase(Locale.current))
         }
     }
 

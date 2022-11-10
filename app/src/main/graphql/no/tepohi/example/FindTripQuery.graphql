@@ -18,7 +18,7 @@ query FindTripQuery(
         longitude: $toLon
       }
     }
-    numTripPatterns: 12
+    numTripPatterns: 3
     dateTime: $date
   ) {
     tripPatterns {
@@ -26,19 +26,47 @@ query FindTripQuery(
       duration
       legs {
         mode
+        expectedStartTime
+        expectedEndTime
         duration
         distance
-        pointsOnLink {
-          points
+
+        fromPlace {
+          name
         }
         toPlace {
           name
         }
         line {
           name
-          id
           publicCode
+          description
+          presentation {
+            textColour
+            colour
+          }
         }
+        intermediateEstimatedCalls {
+          expectedArrivalTime
+          quay {
+            name
+          }
+        }
+        pointsOnLink {
+          points
+        }
+      }
+    }
+    fromPlace {
+      name
+      quay {
+        name
+      }
+    }
+    toPlace {
+      name
+      quay {
+        name
       }
     }
   }

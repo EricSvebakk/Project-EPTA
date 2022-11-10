@@ -55,6 +55,21 @@ class AutoCompleteSource {
 //                idk.postValue(ids)
 
                 searchViewModel.autoCompleteSuggestions.postValue(ids)
+
+                val temp = ArrayList<StopData>()
+
+                ids.forEach { sp ->
+
+                    temp.add(
+                        StopData(
+                            sp.getPrimaryText(null).toString(),
+                            sp.placeId,
+                            -0.0,
+                            -0.0
+                        )
+                    )
+                }
+
 //                searchViewModel.loadPlaces(ids)
 
 //                mavm.startPointData.postValue()

@@ -59,6 +59,11 @@ interface Constants {
         val MAP_BOUNDS_SW = LatLng(59.809, 10.456)
         val MAP_BOUNDS_NE = LatLng(60.136, 10.954)
 
+        const val THEME_LIGHT = "Light theme"
+        const val THEME_DARK = "Dark theme"
+        const val THEME_CONTRAST = "Contrast theme"
+        const val THEME_SYSTEM = "System theme"
+
 //        fun Modifier.moveFocus(
 //            focusRequester: FocusRequester? = null,
 //            nextFocusRequester: FocusRequester? = null,

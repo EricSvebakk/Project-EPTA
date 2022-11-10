@@ -1,12 +1,6 @@
 package no.tepohi.projectepta.ui.viewmodels
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import android.content.Context
-import android.content.res.Resources
 import android.util.Log
-import android.view.View
-import android.widget.Spinner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,25 +12,39 @@ import no.tepohi.example.DepartureBoardQuery
 import no.tepohi.example.FindTripQuery
 import no.tepohi.example.StopPlacesByBoundaryQuery
 import no.tepohi.projectepta.ui.sources.EnturDataSource
+import no.tepohi.projectepta.ui.sources.StopData
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.sqrt
 
-class MainActivityViewModel: ViewModel() {
+class EnturViewModel: ViewModel() {
 
     private val dataSource = EnturDataSource()
     val stopsData = MutableLiveData<List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>>()
 
     val tripsData = MutableLiveData<List<FindTripQuery.TripPattern>>()
     val selectedTripData = MutableLiveData<FindTripQuery.TripPattern>()
-    val showTripsData = MutableLiveData(false)
 
     val departuresData = MutableLiveData<List<DepartureBoardQuery.EstimatedCall>>()
+
+    val newStopsData = MutableLiveData<List<StopData>>()
 
     fun loadStops() {
         viewModelScope.launch(Dispatchers.IO) {
             dataSource.fetchStops().also {
+
+                val temp = ArrayList<StopData>()
+
+                it.forEach { sp ->
+                    temp.add(StopData(sp!!.name, sp.id, sp.latitude!!, sp.longitude!!))
+                }
+
+                newStopsData.postValue(temp)
+
                 stopsData.postValue(it)
+
+                Log.d("loadstops?", it.toString())
             }
         }
     }
@@ -46,9 +54,14 @@ class MainActivityViewModel: ViewModel() {
         end: LatLng,
         time: Calendar = Calendar.getInstance()
     ) {
-        val timeString = SimpleDateFormat("yyyy-MM-dd\'T\'kk:mm:ssXXX").format(time.time)
+        val timeString = SimpleDateFormat("yyyy-MM-dd\'T\'HH:mm:ssXXX").format(time.time)
 
-        Log.d("sdv", stopsData.value.toString())
+//        Log.d("sdv", stopsData.value.toString())
+
+//        stopsData.value?.forEach {
+//            Log.d("test tagx", it.toString())
+//        }
+
         Log.d("start/end", "$start $end")
 
         if (stopsData.value != null) {
@@ -136,123 +149,9 @@ class MainActivityViewModel: ViewModel() {
 
     }
 
-    fun getSelectedTrip(): FindTripQuery.TripPattern? {
-        return selectedTripData.value
-    }
-
-
-    var showMapSettings = MutableLiveData(false)
-
-    fun toggleShowMapSettings() {
-        showMapSettings.postValue(!(showMapSettings.value ?: false))
-//        gesturesEnabled.postValue(!(gesturesEnabled.value ?: true))
-    }
-
     val startPointData = MutableLiveData<AutocompletePrediction>()
     val endPointData = MutableLiveData<AutocompletePrediction>()
-
     val departurePointData = MutableLiveData<AutocompletePrediction>()
-
-    private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
-    private val timeFormat = SimpleDateFormat("kk:mm", Locale.getDefault())
-    val dateTime = MutableLiveData(Calendar.getInstance())
-    var dateString = MutableLiveData(dateFormat.format(Date()))
-    var timeString = MutableLiveData(timeFormat.format(Date()))
-
-    var textFieldFrom = MutableLiveData("Oslo S")
-    var textFieldTo = MutableLiveData("Blindern vgs.")
-
-    fun resetDateTime() {
-        println(dateTime.value)
-
-        val old = dateTime.value!!
-        val new = Calendar.getInstance()
-
-        old.set(Calendar.YEAR, new.get(Calendar.YEAR))
-        old.set(Calendar.MONTH, new.get(Calendar.MONTH))
-        old.set(Calendar.DAY_OF_MONTH, new.get(Calendar.DAY_OF_MONTH))
-        old.set(Calendar.HOUR_OF_DAY, new.get(Calendar.HOUR_OF_DAY))
-        old.set(Calendar.MINUTE, new.get(Calendar.MINUTE))
-
-        updateDate(old)
-        updateTime(old)
-
-        println(dateTime.value)
-    }
-
-    fun selectDate(context: Context) {
-
-        DatePickerDialog(context).also { dpd ->
-            dpd.datePicker.minDate = Date().time
-            dpd.setOnDateSetListener { _, year, month, day ->
-                val date = Calendar.getInstance().also { it.set(year, month, day) }
-
-                updateDate(date)
-            }
-
-            val yearID = Resources.getSystem().getIdentifier("year","id","android")
-            if (yearID != 0) {
-                val year = dpd.findViewById<Spinner>(yearID)
-                if (year != null) {
-                    year.visibility = View.GONE
-                }
-            }
-
-        }.show()
-
-    }
-
-    fun selectTime(context: Context) {
-        val currentDateTime = Calendar.getInstance()
-        val startYear = currentDateTime.get(Calendar.YEAR)
-        val startMonth = currentDateTime.get(Calendar.MONTH)
-        val startDay = currentDateTime.get(Calendar.DAY_OF_MONTH)
-        val startHour = currentDateTime.get(Calendar.HOUR_OF_DAY)
-        val startMinute = currentDateTime.get(Calendar.MINUTE)
-
-        TimePickerDialog(
-            context,
-            { _, hour, minute ->
-
-                val time = Calendar.getInstance().also {
-                    it.set(startYear, startMonth, startDay, hour, minute)
-                }
-                updateTime(time)
-
-            },
-            startHour, startMinute, true
-        ).show()
-
-    }
-
-    private fun updateDate(c: Calendar) {
-        val cal = dateTime.value!!
-
-        cal.set(Calendar.YEAR, c.get(Calendar.YEAR))
-        cal.set(Calendar.MONTH, c.get(Calendar.MONTH))
-        cal.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH))
-
-        dateTime.postValue(cal)
-
-
-        val hoy = dateFormat.format(dateTime.value!!.time)
-        dateString.postValue(hoy)
-            .also { println("updateDate: $it") }
-    }
-
-    private fun updateTime(c: Calendar) {
-        val cal = dateTime.value!!
-
-        cal.set(Calendar.HOUR_OF_DAY, c.get(Calendar.HOUR_OF_DAY))
-        cal.set(Calendar.MINUTE, c.get(Calendar.MINUTE))
-
-        dateTime.postValue(cal)
-
-
-        val hoy = timeFormat.format(dateTime.value!!.time)
-        timeString.postValue(hoy)
-            .also { println("updateTime: $it") }
-    }
 
 }
 

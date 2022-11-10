@@ -23,15 +23,18 @@ class EnturDataSource {
                 10.456,
                 60.136,
                 10.954,
-                true
+                null
             )
 
             val temp = apolloClient.query(query).execute()
+
+            Log.d("fetchStops temp", temp.toString())
+
             temp.data?.stopPlacesByBbox ?: emptyList()
         }
 
         catch (e: Exception) {
-            println("fetchStops: A network request exception was thrown: ${e.message}")
+            println("${e.cause}: fetchStops: A network request exception was thrown: ${e.message}")
             emptyList()
         }
 

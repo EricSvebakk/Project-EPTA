@@ -3,8 +3,6 @@ package no.tepohi.projectepta.ui.screens
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,21 +21,18 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import no.tepohi.projectepta.ui.components.CustomAutoComplete
 import no.tepohi.projectepta.ui.components.CustomDepartureResultCard
-import no.tepohi.projectepta.ui.viewmodels.MainActivityViewModel
+import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
 import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.theme.Constants
 import no.tepohi.projectepta.ui.theme.testColor
+import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
 
 @Composable
 fun DeparturesScreen(
-    mainActivityViewModel: MainActivityViewModel,
-    searchViewModel: SearchViewModel
+    enturViewModel: EnturViewModel,
+    searchViewModel: SearchViewModel,
+    settingsViewModel: SettingsViewModel,
 ) {
-
-    val interactSource = remember { MutableInteractionSource() }
-    if (interactSource.collectIsPressedAsState().value) {
-        mainActivityViewModel.showMapSettings.postValue(true)
-    }
 
     val context = LocalContext.current
     val focusRequester = remember { FocusRequester() }
@@ -45,11 +40,11 @@ fun DeparturesScreen(
 
     var searchText by remember { mutableStateOf("Jernbanetorget") }
 
-    val autoCompleteSuggestions by searchViewModel.autoCompleteSuggestions.observeAsState()
+    val autoCompleteSuggestions by searchViewModel.newStopData.observeAsState()
     val departureSmt by searchViewModel.departurePlaceResult.observeAsState()
-    val dd by mainActivityViewModel.departuresData.observeAsState()
+    val dd by enturViewModel.departuresData.observeAsState()
 
-    val placeID = mainActivityViewModel.departurePointData.value?.placeId ?: ""
+    val placeID = enturViewModel.departurePointData.value?.placeId ?: ""
 
     if (placeID != "") {
         searchViewModel.DeparturePlaceResult(placeID)
@@ -69,10 +64,9 @@ fun DeparturesScreen(
         CustomAutoComplete(
             value = searchText,
             label = "from",
-            items = autoCompleteSuggestions ?: emptyList(),
-            dropDownSize = 180.dp,
+            dropdownItems = autoCompleteSuggestions ?: emptyList(),
+            dropdownHeight = 180.dp,
             focusRequester = focusRequester,
-            interactionSource = interactSource,
             onValueChange = { searchString ->
                 searchText = searchString
                 Log.d("top DONE 1",searchText)
@@ -81,23 +75,23 @@ fun DeparturesScreen(
             onDoneAction = { ACP ->
                 Log.d("top DONE 2", ACP.toString())
     //                searchViewModel.loadPlaceResult(ACP.placeId)
-                mainActivityViewModel.departurePointData.postValue(ACP)
+//                enturViewModel.departurePointData.postValue(ACP)
             },
-            trailingIcon = {
-                Row(
-                    modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                ) {
-                    IconButton(
-                        modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS)),
-                        content = {
-                            Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
-                        },
-                        onClick = {
-                            mainActivityViewModel.loadDepartures(departureSmt?.pos ?: LatLng(0.0, 0.0))
-                        },
-                    )
-                }
-            },
+//            trailingIcon = {
+//                Row(
+//                    modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+//                ) {
+//                    IconButton(
+//                        modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS)),
+//                        content = {
+//                            Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+//                        },
+//                        onClick = {
+//                            enturViewModel.loadDepartures(departureSmt?.pos ?: LatLng(0.0, 0.0))
+//                        },
+//                    )
+//                }
+//            },
         )
 
         Spacer(modifier = Modifier.height(Constants.PADDING_INNER))

@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,14 +38,15 @@ fun CustomResultCard(
         Transports.Rail,
     )
 
-    Column(
-        verticalArrangement = Arrangement.Center,
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
-//                        .fillMaxWidth()
-//                        .clickable {
-//                            navigateToMap(viewModel, navController, tripPattern)
-//                        }
-            .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colors.onBackground,
+                shape = RoundedCornerShape(Constants.CORNER_RADIUS)
+            )
             .clip(RoundedCornerShape(Constants.CORNER_RADIUS))
             .clickable(enabled = true) {
 
@@ -52,26 +54,9 @@ fun CustomResultCard(
             .padding(Constants.PADDING_INNER)
     ) {
 
-        val dateAsRaw = tripPattern.expectedStartTime.toString()
-        val dateAsObject = SimpleDateFormat(Constants.ENTUR_FORMAT, Locale.getDefault()).parse(dateAsRaw)!!
-        val dateAsString = SimpleDateFormat(Constants.TRIP_TIME, Locale.getDefault()).format(dateAsObject)
-        val duration = (tripPattern.duration.toString().toInt() / 60.0).toInt().toString()
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-//                            .weight(1f)
-                .width(55.dp)
-                .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-        ) {
-            Text(text = dateAsString, textAlign = TextAlign.Center)
-            Text(text = "(${duration}min)", textAlign = TextAlign.Center,fontSize = 12.sp)
-        }
-
         Column(
             horizontalAlignment = Alignment.Start,
             modifier = Modifier
-//                            .weight(3f)
                 .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
         ) {
 
@@ -139,8 +124,19 @@ fun CustomResultCard(
             }
         }
 
+        val dateAsRaw = tripPattern.expectedStartTime.toString()
+        val dateAsObject = SimpleDateFormat(Constants.ENTUR_FORMAT, Locale.getDefault()).parse(dateAsRaw)!!
+        val dateAsString = SimpleDateFormat(Constants.TRIP_TIME, Locale.getDefault()).format(dateAsObject)
+        val duration = (tripPattern.duration.toString().toInt() / 60.0).toInt().toString()
 
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .width(55.dp)
+                .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+        ) {
+            Text(text = dateAsString, textAlign = TextAlign.Center)
+            Text(text = "(${duration}min)", textAlign = TextAlign.Center,fontSize = 12.sp)
+        }
     }
-//                Divider()
-
 }
