@@ -1,15 +1,29 @@
 package no.tepohi.projectepta.ui.screens
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.zIndex
+import no.tepohi.projectepta.ui.components.CustomAutoComplete
+import no.tepohi.projectepta.ui.components.CustomButton
+import no.tepohi.projectepta.ui.sources.StopData
 import no.tepohi.projectepta.ui.theme.Constants
+import no.tepohi.projectepta.ui.theme.testColor
 import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
 import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
@@ -21,34 +35,197 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
 ) {
 
+    val showPopUp by settingsViewModel.showPopUp.observeAsState()
+
     Column(
-        modifier = Modifier
-            .padding(Constants.PADDING_OUTER)
-            .border(2.dp, MaterialTheme.colors.onBackground, RoundedCornerShape(Constants.CORNER_RADIUS))
-            .fillMaxWidth()
-            .height(200.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
 
-        listOf(
-            Constants.THEME_LIGHT,
-            Constants.THEME_DARK,
-            Constants.THEME_SYSTEM
-        ).forEach { theme ->
+        Column(
+            modifier = Modifier
+                .padding(Constants.PADDING_OUTER)
+                .border(
+                    2.dp,
+                    MaterialTheme.colors.onBackground,
+                    RoundedCornerShape(Constants.CORNER_RADIUS)
+                )
+                .padding(Constants.PADDING_OUTER)
+        ) {
+            Favourites(
+                enturViewModel = enturViewModel,
+                searchViewModel = searchViewModel,
+                settingsViewModel = settingsViewModel
+            )
+        }
 
-            Button(
-                modifier = Modifier
-                    .padding(Constants.PADDING_INNER)
-                    .fillMaxWidth()
-                    .weight(1f)
-                ,
-                onClick = {
-                    settingsViewModel.appColorPalette.postValue(theme)
-                }
-            ) {
-                Text(text = theme)
-            }
+        Column(
+            modifier = Modifier
+                .padding(Constants.PADDING_OUTER)
+                .border(
+                    2.dp,
+                    MaterialTheme.colors.onBackground,
+                    RoundedCornerShape(Constants.CORNER_RADIUS)
+                )
+                .fillMaxWidth()
+                .height(200.dp)
+        ) {
+
+            val mod = Modifier.weight(1f)
+
+            ChoosingTheme(
+                enturViewModel = enturViewModel,
+                settingsViewModel = settingsViewModel,
+                searchViewModel = searchViewModel,
+                modifier = mod
+            )
+        }
+
+    }
+
+    AnimatedVisibility(
+        visible = showPopUp ?: false,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(0.5f))
+                .zIndex(1000f)
+        ) {
         }
     }
 
 
+}
+
+@Composable
+fun ChoosingTheme(
+    enturViewModel: EnturViewModel,
+    searchViewModel: SearchViewModel,
+    settingsViewModel: SettingsViewModel,
+    modifier: Modifier
+) {
+    val acp by settingsViewModel.appColorPalette.observeAsState()
+
+    listOf(
+        Constants.THEME_LIGHT,
+        Constants.THEME_DARK,
+        Constants.THEME_SYSTEM
+    ).forEach { theme ->
+
+        if (acp == theme)
+            modifier.border(2.dp, MaterialTheme.colors.onBackground)
+
+        Button(
+            modifier = Modifier
+                .padding(Constants.PADDING_INNER)
+                .fillMaxWidth()
+                .then(modifier)
+            ,
+            onClick = {
+                settingsViewModel.appColorPalette.postValue(theme)
+            }
+        ) {
+            Text(text = theme)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun Favourites(
+    enturViewModel: EnturViewModel,
+    searchViewModel: SearchViewModel,
+    settingsViewModel: SettingsViewModel,
+) {
+
+    val focusRequester1 = remember { FocusRequester() }
+
+    val allStops by enturViewModel.newStopsData.observeAsState()
+    val favouriteStops by settingsViewModel.favouriteStops.observeAsState()
+
+    val showPopup by settingsViewModel.showPopUp.observeAsState()
+
+    val context = LocalContext.current
+
+    var searchText by remember { mutableStateOf("") }
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+//            .padding(Constants.PADDING_INNER)
+            .fillMaxWidth()
+            .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+    ) {
+        Text(text = "Favourite stops")
+    }
+    Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+    ) {
+
+        CustomAutoComplete(
+            value = searchText,
+            label = "Stop name",
+            dropdownItems = allStops ?: emptyList(),
+            focusRequester = focusRequester1,
+            onValueChange = { searchString ->
+                searchText = searchString
+                searchViewModel.loadAutoCompleteSuggestions(context, searchText)
+            },
+            onDoneAction = { ACP ->
+
+                val temp = arrayListOf<StopData>()
+                favouriteStops?.forEach { stop ->
+                    temp.add(stop)
+                }
+                temp.add(ACP)
+
+                settingsViewModel.favouriteStops.postValue(temp)
+
+            },
+        )
+
+        favouriteStops?.forEach { heh ->
+            val ds = rememberDismissState()
+
+           if (ds.isDismissed(DismissDirection.EndToStart)) {
+               val temp = arrayListOf<StopData>()
+               favouriteStops?.forEach { stop ->
+                   temp.add(stop)
+               }
+               temp.remove(heh)
+
+               settingsViewModel.favouriteStops.postValue(temp)
+           }
+
+           SwipeToDismiss(
+               modifier = Modifier,
+               state = ds,
+               background = { },
+           ) {
+               Card(
+                   elevation = 10.dp,
+                   backgroundColor = MaterialTheme.colors.secondary,
+                   modifier = Modifier
+                       .padding(Constants.PADDING_INNER)
+                       .fillMaxWidth()
+               ) {
+                    Text(
+                        text = heh.name,
+                        color = MaterialTheme.colors.onSecondary,
+                        modifier = Modifier
+                            .padding(Constants.PADDING_INNER)
+                    )
+               }
+               Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
+           }
+       }
+
+    }
 }

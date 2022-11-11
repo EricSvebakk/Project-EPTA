@@ -1,5 +1,6 @@
 package no.tepohi.projectepta.ui.components
 
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
@@ -36,6 +38,13 @@ fun ShowLeg(
 
     var clicked by remember { mutableStateOf(false) }
 
+    val hex = leg?.line?.presentation?.colour
+
+    val c = if (hex != null)
+        Color(android.graphics.Color.parseColor("#$hex"))
+    else
+        Color(148, 148, 148, 255)
+
     Box(
         contentAlignment = Alignment.CenterStart,
         modifier = Modifier
@@ -51,7 +60,7 @@ fun ShowLeg(
         val endDate = SimpleDateFormat(Constants.TRIP_TIME, Locale.getDefault()).format(dateAsObject)
 
         if (leg?.intermediateEstimatedCalls?.isEmpty() == true) {
-            NoIntermediateCalls(startDate, endDate, leg, item, 80.dp)
+            NoIntermediateCalls(startDate, endDate, leg, c, 80.dp)
         } else {
             Box(
                 modifier = Modifier
@@ -72,7 +81,7 @@ fun ShowLeg(
                         .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
                         .clip(RectangleShape)
                 ) {
-                    IntermediateCalls(startDate, leg, item, 40.dp)
+                    IntermediateCalls(startDate, leg, c, 40.dp)
                 }
                 AnimatedVisibility(
                     visible = !clicked,
@@ -88,7 +97,7 @@ fun ShowLeg(
                         .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
                         .clip(RectangleShape)
                 ) {
-                    NoIntermediateCalls(startDate, endDate, leg, item, 80.dp, false)
+                    NoIntermediateCalls(startDate, endDate, leg, c, 80.dp, false)
                 }
             }
         }
@@ -105,7 +114,7 @@ fun ShowLeg(
                     .padding(start = 50.dp)
                     .width(78.dp)
                     .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                    .background(item.color, RoundedCornerShape(4.dp))
+                    .background(c, RoundedCornerShape(4.dp))
                     .padding(2.dp)
             ) {
 
@@ -150,7 +159,7 @@ fun ShowLeg(
 fun IntermediateCalls(
     date: String,
     leg:  FindTripQuery.Leg?,
-    item: Transports,
+    color: Color,
     lineLength: Dp
 ) {
 
@@ -165,7 +174,7 @@ fun IntermediateCalls(
             startTime = date,
             endText = "",
             endTime = "",
-            lineColour = item.color,
+            lineColour = color,
             nodeColour = MaterialTheme.colors.onSurface,
             canvasHeight = lineLength
         )
@@ -178,7 +187,7 @@ fun IntermediateCalls(
             TripLine(
                 startText = EC?.quay?.name.toString(),
                 startTime = dateAsString,
-                lineColour = item.color,
+                lineColour = color,
                 nodeColour = MaterialTheme.colors.onSurface,
                 canvasHeight = lineLength
             )
@@ -192,7 +201,8 @@ fun NoIntermediateCalls(
     startDate: String,
     endDate: String,
     leg:  FindTripQuery.Leg?,
-    item: Transports,
+    color: Color,
+//    item: Transports,
     lineLength: Dp,
     lineExpanded: Boolean = true,
 ) {
@@ -202,7 +212,7 @@ fun NoIntermediateCalls(
         startTime = startDate,
         endText = leg?.toPlace?.name.toString(),
         endTime = endDate,
-        lineColour = item.color,
+        lineColour = color,
         nodeColour = MaterialTheme.colors.onSurface,
         canvasHeight = lineLength,
         lineExpanded = lineExpanded

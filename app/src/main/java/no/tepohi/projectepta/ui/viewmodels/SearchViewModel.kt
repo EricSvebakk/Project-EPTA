@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import no.tepohi.projectepta.ui.components.polyline
 import no.tepohi.projectepta.ui.sources.AutoCompleteSource
 import no.tepohi.projectepta.ui.sources.StopData
 
@@ -18,12 +19,18 @@ class SearchViewModel : ViewModel() {
 
 //    var mavm: MainActivityViewModel? = null
 
+    val searchTempText = MutableLiveData("")
+    val searchFromText = MutableLiveData("")
+    val searchToText = MutableLiveData("")
+
     val autoCompleteSuggestions = MutableLiveData(mutableListOf<AutocompletePrediction>())
     val toPlaceResult = MutableLiveData<Result>()
     val fromPlaceResult = MutableLiveData<Result>()
     val departurePlaceResult = MutableLiveData<Result>()
 
-    val newStopData = MutableLiveData<List<StopData>>()
+//    val newStopData = MutableLiveData<List<StopData>>()
+
+    val polylines = MutableLiveData<ArrayList<polyline>>()
 
     /**
      * Predicts a list of searchResults based on query-string using autocompleteSource

@@ -29,7 +29,7 @@ fun appColors(colorPalette: String, darkTheme: Boolean): AppColors =
 
 @Composable
 fun EptaTheme(
-    colorPalette: String = Constants.THEME_LIGHT,
+    colorPalette: String = Constants.THEME_SYSTEM,
     content: @Composable () -> Unit
 ) {
 

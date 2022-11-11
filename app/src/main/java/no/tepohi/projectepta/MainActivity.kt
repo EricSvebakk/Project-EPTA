@@ -12,11 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import no.tepohi.projectepta.ui.sources.StopData
 import no.tepohi.projectepta.ui.theme.Constants
 import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
 import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.theme.EptaTheme
 import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
+import java.lang.NumberFormatException
 
 class MainActivity : ComponentActivity() {
 
@@ -60,15 +62,34 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
 
+//        this.deleteSharedPreferences("EptaPreferences")
+
         val sp = this.getSharedPreferences("EptaPreferences", MODE_PRIVATE)
+
 
         settingsViewModel.appColorPalette.postValue(sp.getString("appColorPalette", Constants.THEME_SYSTEM))
 
-//        appViewModel.mapSettingsShowPollution.postValue(sp.getBoolean("mapSettingsShowPollution", false))
-//        appViewModel.mapSettingsShowAltitude.postValue(sp.getBoolean("mapSettingsShowAltitude", false))
-//        appViewModel.mapSettingsShowTraffic.postValue(sp.getBoolean("mapSettingsShowTraffic", false))
-//        appViewModel.mapSettingsShowReturn.postValue(sp.getBoolean("mapSettingsShowReturn", false))
-//        appViewModel.mapSettingsDistance.postValue(sp.getFloat("mapSettingsDistance", 0f))
+        val data = mutableListOf<StopData>()
+        sp.getStringSet("favouriteStops", emptySet())?.forEach { stop ->
+
+            val temp = stop.split(",")
+
+            try {
+                data.add(
+                    StopData(
+                        temp[0],
+                        temp[1],
+                        temp[2].toDouble(),
+                        temp[3].toDouble()
+                    )
+                )
+            }
+            catch (err: NumberFormatException) {
+                Log.e("sharedPref", temp.toString())
+            }
+        }
+
+        settingsViewModel.favouriteStops.postValue(data)
     }
 
     override fun onPause() {
@@ -77,13 +98,13 @@ class MainActivity : ComponentActivity() {
         val sp = this.getSharedPreferences("EptaPreferences", MODE_PRIVATE)
         val edit = sp.edit()
 
-        edit.putString("appColorPalette", settingsViewModel.appColorPalette.value ?: Constants.THEME_SYSTEM)
+        val data = mutableSetOf<String>()
+        settingsViewModel.favouriteStops.value?.forEach { stop ->
+            data.add("${stop.name},${stop.id},${stop.latitude},${stop.longitude}")
+        }
 
-//        edit.putBoolean("mapSettingsShowPollution", appViewModel.mapSettingsShowPollution.value ?: false)
-//        edit.putBoolean("mapSettingsShowAltitude", appViewModel.mapSettingsShowAltitude.value ?: false)
-//        edit.putBoolean("mapSettingsShowTraffic", appViewModel.mapSettingsShowTraffic.value ?: false)
-//        edit.putBoolean("mapSettingsShowReturn", appViewModel.mapSettingsShowReturn.value ?: false)
-//        edit.putFloat("mapSettingsDistance", appViewModel.mapSettingsDistance.value ?: 0f)
+        edit.putStringSet("favouriteStops", data)
+        edit.putString("appColorPalette", settingsViewModel.appColorPalette.value ?: Constants.THEME_SYSTEM)
 
         edit.apply()
     }

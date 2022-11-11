@@ -11,6 +11,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.Marker
 
 // https://stackoverflow.com/questions/70598043/how-to-use-custom-icon-of-google-maps-marker-in-compose
@@ -19,6 +20,7 @@ fun CustomMapMarker(
     context: Context,
     position: LatLng,
     title: String,
+    onClick: () -> Unit = { },
     snippet: String? = null,
     @DrawableRes iconResourceId: Int
 ) {
@@ -31,6 +33,10 @@ fun CustomMapMarker(
         title = title,
         snippet = snippet,
         icon = icon,
+        onClick = {
+            onClick()
+            false
+        }
     )
 }
 

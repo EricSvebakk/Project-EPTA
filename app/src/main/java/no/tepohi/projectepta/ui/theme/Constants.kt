@@ -12,37 +12,42 @@ import com.google.android.gms.maps.model.LatLng
 import no.tepohi.projectepta.R
 
 
-sealed class Transports(var mode: String, var iconTableId: Int, var iconMapId: Int, var color: Color){
+sealed class Transports(
+    var mode: String,
+    var iconTableId: Int,
+    var iconMapId: Int,
+//    var color: Color
+    ){
 
     object Foot : Transports(
         mode = "foot",
         iconTableId = R.drawable.icon_table_walk_24,
         iconMapId = R.drawable.icon_map_walk_36,
-        color = Color(37, 195, 241, 151),
+//        color = Color(37, 195, 241, 151),
     )
     object Bus : Transports(
         mode = "bus",
         iconTableId = R.drawable.icon_table_bus_24,
         iconMapId = R.drawable.icon_map_bus_36,
-        color = Color(196, 26, 74, 255),
+//        color = Color(196, 26, 74, 255),
     )
     object Tram : Transports(
         mode = "tram",
         iconTableId = R.drawable.icon_table_tram_24,
         iconMapId = R.drawable.icon_map_tram_36,
-        color = Color(3, 169, 244, 255),
+//        color = Color(3, 169, 244, 255),
     )
     object Metro : Transports(
         mode = "metro",
         iconTableId = R.drawable.icon_table_metro_24,
         iconMapId = R.drawable.icon_map_metro_36,
-        color = Color(221, 111, 38, 255),
+//        color = Color(221, 111, 38, 255),
     )
     object Rail : Transports(
         mode = "rail",
         iconTableId = R.drawable.icon_table_train_24,
         iconMapId = R.drawable.icon_map_train_36,
-        color = Color(20, 162, 77, 255),
+//        color = Color(20, 162, 77, 255),
     )
 }
 

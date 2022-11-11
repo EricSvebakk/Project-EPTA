@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="afb7fad0-377e-43bf-b3d3-cde1b3724a16" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/screens/PL.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/screens/Testing.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/components/CustomDepartureResultCard.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/components/CustomDepartureResultCard.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/components/CustomResultCard.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/components/CustomResultCard.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/components/NewCustomResultCard.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/components/NewCustomResultCard.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/components/ShowLeg.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/components/ShowLeg.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/screens/DeparturesScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/screens/DeparturesScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/screens/SettingsScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/screens/SettingsScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/screens/TravelScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/screens/TravelScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/theme/Constants.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/theme/Constants.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/viewmodels/SearchViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/viewmodels/SearchViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/viewmodels/SettingsViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/no/tepohi/projectepta/ui/viewmodels/SettingsViewModel.kt" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="2HOxYoWcb83VQON6W7HZIM6mysw" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="afb7fad0-377e-43bf-b3d3-cde1b3724a16" name="Default Changelist" comment="" />
+      <created>1668169980659</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1668169980659</updated>
+    </task>
+    <servers />
+  </component>
+</project>

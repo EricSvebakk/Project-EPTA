@@ -7,24 +7,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.maps.model.LatLng
 import no.tepohi.projectepta.ui.components.CustomAutoComplete
 import no.tepohi.projectepta.ui.components.CustomDepartureResultCard
-import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
-import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.theme.Constants
 import no.tepohi.projectepta.ui.theme.testColor
+import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
+import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
 
 @Composable
@@ -40,7 +35,7 @@ fun DeparturesScreen(
 
     var searchText by remember { mutableStateOf("Jernbanetorget") }
 
-    val autoCompleteSuggestions by searchViewModel.newStopData.observeAsState()
+//    val autoCompleteSuggestions by searchViewModel.newStopData.observeAsState()
     val departureSmt by searchViewModel.departurePlaceResult.observeAsState()
     val dd by enturViewModel.departuresData.observeAsState()
 
@@ -64,7 +59,8 @@ fun DeparturesScreen(
         CustomAutoComplete(
             value = searchText,
             label = "from",
-            dropdownItems = autoCompleteSuggestions ?: emptyList(),
+//            dropdownItems = autoCompleteSuggestions ?: emptyList(),
+            dropdownItems = emptyList(),
             dropdownHeight = 180.dp,
             focusRequester = focusRequester,
             onValueChange = { searchString ->
