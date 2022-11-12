@@ -12,7 +12,6 @@ import no.tepohi.example.DepartureBoardQuery
 import no.tepohi.example.FindTripQuery
 import no.tepohi.example.StopPlacesByBoundaryQuery
 import no.tepohi.projectepta.ui.sources.EnturDataSource
-import no.tepohi.projectepta.ui.sources.StopData
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -28,19 +27,11 @@ class EnturViewModel: ViewModel() {
 
     val departuresData = MutableLiveData<List<DepartureBoardQuery.EstimatedCall>>()
 
-    val newStopsData = MutableLiveData<List<StopData>>()
+//    val newStopsData = MutableLiveData<List<StopData>>()
 
     fun loadStops() {
         viewModelScope.launch(Dispatchers.IO) {
             dataSource.fetchStops().also {
-
-                val temp = ArrayList<StopData>()
-
-                it.forEach { sp ->
-                    temp.add(StopData(sp!!.name, sp.id, sp.latitude!!, sp.longitude!!))
-                }
-
-                newStopsData.postValue(temp)
 
                 stopsData.postValue(it)
 

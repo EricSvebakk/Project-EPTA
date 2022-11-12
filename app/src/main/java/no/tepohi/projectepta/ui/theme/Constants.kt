@@ -1,11 +1,15 @@
 package no.tepohi.projectepta.ui.theme
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
@@ -68,6 +72,24 @@ interface Constants {
         const val THEME_DARK = "Dark theme"
         const val THEME_CONTRAST = "Contrast theme"
         const val THEME_SYSTEM = "System theme"
+
+        @OptIn(ExperimentalComposeUiApi::class)
+        fun Modifier.gesturesDisabled(disabled: Boolean = true): Modifier {
+            return if (disabled) {
+                pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        // we should wait for all new pointer events
+                        while (true) {
+                            awaitPointerEvent(pass = PointerEventPass.Initial)
+                                .changes
+                                .forEach(PointerInputChange::consume)
+                        }
+                    }
+                }
+            } else {
+                this
+            }
+        }
 
 //        fun Modifier.moveFocus(
 //            focusRequester: FocusRequester? = null,

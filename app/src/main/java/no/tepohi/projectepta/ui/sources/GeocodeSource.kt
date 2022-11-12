@@ -1,4 +1,4 @@
-package no.tepohi.projectepta.ui.viewmodels
+package no.tepohi.projectepta.ui.sources
 
 import android.util.Log
 import com.github.kittinunf.fuel.Fuel

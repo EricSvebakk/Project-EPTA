@@ -1,129 +1,130 @@
 package no.tepohi.projectepta.ui.components
 
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import no.tepohi.example.DepartureBoardQuery
+import com.google.android.gms.maps.model.LatLng
+import no.tepohi.example.FindTripQuery
+import no.tepohi.projectepta.ui.screens.decode
 import no.tepohi.projectepta.ui.theme.Constants
 import no.tepohi.projectepta.ui.theme.Transports
 import no.tepohi.projectepta.ui.theme.testColor
+import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
+import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun CustomDepartureResultCard(
-    EstimatedCall: DepartureBoardQuery.EstimatedCall
+fun TravelResultCard(
+    tripPattern: FindTripQuery.TripPattern,
+    searchViewModel: SearchViewModel,
+    settingsViewModel: SettingsViewModel
 ) {
-//
-//    val mode = EstimatedCall.serviceJourney?.journeyPattern?.line?.transportMode?.name ?: "none"
-//    val line = EstimatedCall.serviceJourney?.journeyPattern?.line?.publicCode ?: "none"
-//
-//    val items = listOf(
-//        Transports.Bus,
-//        Transports.Tram,
-//        Transports.Metro,
-//        Transports.Rail,
-//    )
-//
-//    Row(
-//        horizontalArrangement = Arrangement.SpaceBetween,
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-//            .clip(RoundedCornerShape(Constants.CORNER_RADIUS))
-//            .clickable(enabled = true) {
-//
-//            }
-//            .padding(Constants.PADDING_INNER)
-//    ) {
-//
-//        Column(
-//            horizontalAlignment = Alignment.Start,
-//            modifier = Modifier
-////                            .weight(3f)
-//                .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-//        ) {
-//
-//            items.forEach { item ->
-//
-//                if (item.mode == mode) {
-//
-//                    Row(
-//                        horizontalArrangement = Arrangement.Start,
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        modifier = Modifier
-//                            .width(78.dp)
-//                            .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-//                            .background(c, RoundedCornerShape(4.dp))
-//                            .padding(2.dp)
-//                    ) {
-//
-//                        Image(
-//                            modifier = Modifier
-//                                .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-//                            ,
-//                            painter = painterResource(id = item.iconTableId),
-//                            contentDescription = item.mode,
-////                                                colorFilter = ColorFilter.tint( Color.White)
-//                        )
-//
-//                        Text(
-//                            modifier = Modifier
-//                                .weight(1f)
-//                                .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-//                            ,
-//                            textAlign = TextAlign.Center,
-//                            text = line,
-//                            color = Color.Black,
-//                            fontSize = 14.sp
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//
-//        val aimedTimeAsRaw = EstimatedCall.aimedArrivalTime.toString()
-//        val aimedTimeAsObject = SimpleDateFormat(Constants.ENTUR_FORMAT, Locale.getDefault()).parse(aimedTimeAsRaw)!!
-//        val aimedTimeAsString = SimpleDateFormat(Constants.TRIP_TIME, Locale.getDefault()).format(aimedTimeAsObject)
-//
-//        val expectedTimeAsRaw = EstimatedCall.expectedArrivalTime.toString()
-//        val expectedTimeAsObject = SimpleDateFormat(Constants.ENTUR_FORMAT, Locale.getDefault()).parse(expectedTimeAsRaw)!!
-//        val expectedTimeAsString = SimpleDateFormat(Constants.TRIP_TIME, Locale.getDefault()).format(expectedTimeAsObject)
-//
-//        Column(
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            modifier = Modifier
-////                            .weight(1f)
-//                .width(55.dp)
-//                .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-//        ) {
-//
-//            if (aimedTimeAsString.equals(expectedTimeAsString)) {
-//                Text(text = aimedTimeAsString, textAlign = TextAlign.Center)
-//                Text(text = expectedTimeAsString, textAlign = TextAlign.Center, color = Color.Transparent)
-//            }
-//            else {
-//                Text(text = aimedTimeAsString, textAlign = TextAlign.Center, textDecoration = TextDecoration.LineThrough)
-//                Text(text = expectedTimeAsString, textAlign = TextAlign.Center)
-//            }
-//        }
-//
-//    }
-////                Divider()
-//
+
+    val items = listOf(
+        Transports.Foot,
+        Transports.Bus,
+        Transports.Tram,
+        Transports.Metro,
+        Transports.Rail,
+    )
+
+    var polylines: ArrayList<polyline> = arrayListOf()
+
+    Card(
+        elevation = 10.dp
+    ) {
+
+        // places travel-results over show-map-button
+        Column {
+
+            //
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Constants.PADDING_INNER)
+            ) {
+
+                // Orders tripPatterns correctly
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                        .padding(Constants.PADDING_INNER + 10.dp)
+                ) {
+
+                    tripPattern.legs.forEach { leg ->
+
+                        val item = items.find { it.mode == leg?.mode.toString() }!!
+
+                        val result = decode(leg?.pointsOnLink?.points.toString())
+                        val hex = leg?.line?.presentation?.colour
+                        val c = if (hex != null)
+                            Color(android.graphics.Color.parseColor("#$hex"))
+                        else
+                            Color(148, 148, 148, 255)
+
+                        val pl = polyline(
+                            result,
+                            c,
+                            leg?.fromPlace?.name ?: "",
+                            item.iconMapId
+                        )
+
+                        ShowLeg(leg, item, c)
+                        polylines.add(pl)
+                    }
+                }
+
+                val dateAsRaw = tripPattern.expectedStartTime.toString()
+                val dateAsObject = SimpleDateFormat(Constants.ENTUR_FORMAT, Locale.getDefault()).parse(dateAsRaw)!!
+                val dateAsString = SimpleDateFormat(Constants.TRIP_TIME, Locale.getDefault()).format(dateAsObject)
+                val duration = (tripPattern.duration.toString().toInt() / 60.0).toInt().toString()
+
+                // Top right text
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .width(55.dp)
+                        .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                ) {
+                    Text(text = dateAsString, textAlign = TextAlign.Center)
+                    Text(text = "(${duration}min)", textAlign = TextAlign.Center,fontSize = 12.sp)
+                }
+            }
+
+            // Button
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .padding(
+                        bottom = Constants.PADDING_INNER,
+                        end = Constants.PADDING_INNER,
+                    )
+                    .fillMaxWidth()
+            ) {
+                CustomButton(
+                    content = "show",
+                    onClick = {
+                        searchViewModel.polylines.postValue(polylines)
+                        settingsViewModel.showTripsData.postValue(false)
+                    }
+                )
+            }
+        }
+    }
+
 }
+
+data class polyline(val points: List<LatLng>, val color: Color, val text: String, val startPointIconId: Int)

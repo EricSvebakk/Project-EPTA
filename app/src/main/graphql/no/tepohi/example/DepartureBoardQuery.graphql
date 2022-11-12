@@ -13,6 +13,10 @@ query DepartureBoardQuery(
             name
             transportMode
             publicCode
+            presentation {
+              colour
+              textColour
+            }
           }
           pointsOnLink {
             points

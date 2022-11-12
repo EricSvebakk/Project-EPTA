@@ -33,17 +33,11 @@ import java.util.*
 @Composable
 fun ShowLeg(
     leg:  FindTripQuery.Leg?,
-    item: Transports
+    item: Transports,
+    color: Color
 ) {
 
     var clicked by remember { mutableStateOf(false) }
-
-    val hex = leg?.line?.presentation?.colour
-
-    val c = if (hex != null)
-        Color(android.graphics.Color.parseColor("#$hex"))
-    else
-        Color(148, 148, 148, 255)
 
     Box(
         contentAlignment = Alignment.CenterStart,
@@ -60,7 +54,7 @@ fun ShowLeg(
         val endDate = SimpleDateFormat(Constants.TRIP_TIME, Locale.getDefault()).format(dateAsObject)
 
         if (leg?.intermediateEstimatedCalls?.isEmpty() == true) {
-            NoIntermediateCalls(startDate, endDate, leg, c, 80.dp)
+            NoIntermediateCalls(startDate, endDate, leg, color, 80.dp)
         } else {
             Box(
                 modifier = Modifier
@@ -81,7 +75,7 @@ fun ShowLeg(
                         .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
                         .clip(RectangleShape)
                 ) {
-                    IntermediateCalls(startDate, leg, c, 40.dp)
+                    IntermediateCalls(startDate, leg, color, 40.dp)
                 }
                 AnimatedVisibility(
                     visible = !clicked,
@@ -97,7 +91,7 @@ fun ShowLeg(
                         .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
                         .clip(RectangleShape)
                 ) {
-                    NoIntermediateCalls(startDate, endDate, leg, c, 80.dp, false)
+                    NoIntermediateCalls(startDate, endDate, leg, color, 80.dp, false)
                 }
             }
         }
@@ -114,7 +108,7 @@ fun ShowLeg(
                     .padding(start = 50.dp)
                     .width(78.dp)
                     .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                    .background(c, RoundedCornerShape(4.dp))
+                    .background(color, RoundedCornerShape(4.dp))
                     .padding(2.dp)
             ) {
 

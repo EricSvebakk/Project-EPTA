@@ -4,7 +4,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-val testColor = if (true) Color(0xFFFF0000) else Color.Transparent
+val testColor = if (false) Color(0xFFFF0000) else Color.Transparent
 
 val LightColorPalette = AppColors(
     materialColors = lightColors(

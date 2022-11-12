@@ -1,6 +1,5 @@
 package no.tepohi.projectepta.ui.screens
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -9,19 +8,25 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
 import androidx.compose.ui.zIndex
+import com.google.android.gms.maps.CameraUpdateFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import no.tepohi.example.StopPlacesByBoundaryQuery
 import no.tepohi.projectepta.ui.components.CustomAutoComplete
-import no.tepohi.projectepta.ui.components.CustomButton
-import no.tepohi.projectepta.ui.sources.StopData
 import no.tepohi.projectepta.ui.theme.Constants
 import no.tepohi.projectepta.ui.theme.testColor
 import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
@@ -142,7 +147,7 @@ fun Favourites(
 
     val focusRequester1 = remember { FocusRequester() }
 
-    val allStops by enturViewModel.newStopsData.observeAsState()
+    val allStops by enturViewModel.stopsData.observeAsState()
     val favouriteStops by settingsViewModel.favouriteStops.observeAsState()
 
     val showPopup by settingsViewModel.showPopUp.observeAsState()
@@ -180,51 +185,107 @@ fun Favourites(
             },
             onDoneAction = { ACP ->
 
-                val temp = arrayListOf<StopData>()
+                val temp = arrayListOf<StopPlacesByBoundaryQuery.StopPlacesByBbox?>()
                 favouriteStops?.forEach { stop ->
                     temp.add(stop)
                 }
                 temp.add(ACP)
 
                 settingsViewModel.favouriteStops.postValue(temp)
-
+                searchText = ""
             },
         )
 
         favouriteStops?.forEach { heh ->
-            val ds = rememberDismissState()
 
-           if (ds.isDismissed(DismissDirection.EndToStart)) {
-               val temp = arrayListOf<StopData>()
-               favouriteStops?.forEach { stop ->
-                   temp.add(stop)
-               }
-               temp.remove(heh)
+            var toggle by remember { mutableStateOf(false) }
 
-               settingsViewModel.favouriteStops.postValue(temp)
-           }
+            Box(
+                contentAlignment = Alignment.CenterEnd,
+                modifier = Modifier
+                    .clip(RectangleShape)
+            ) {
+                ActionsRow(
+                    actionIconSize = 50.dp,
+                    onDelete = {
+                        val temp = arrayListOf<StopPlacesByBoundaryQuery.StopPlacesByBbox?>()
+                        favouriteStops?.forEach { stop ->
+                            temp.add(stop)
+                        }
+                        temp.remove(heh)
 
-           SwipeToDismiss(
-               modifier = Modifier,
-               state = ds,
-               background = { },
-           ) {
-               Card(
-                   elevation = 10.dp,
-                   backgroundColor = MaterialTheme.colors.secondary,
-                   modifier = Modifier
-                       .padding(Constants.PADDING_INNER)
-                       .fillMaxWidth()
-               ) {
-                    Text(
-                        text = heh.name,
-                        color = MaterialTheme.colors.onSecondary,
-                        modifier = Modifier
-                            .padding(Constants.PADDING_INNER)
-                    )
-               }
-               Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
-           }
+                        settingsViewModel.favouriteStops.postValue(temp)
+                    },
+                    onEdit = { /*TODO*/ },
+                    onFavorite = {  }
+                )
+                DraggableCard(
+                    card = CardModel(heh?.id ?: "", heh?.name ?: ""),
+                    cardHeight = 50.dp,
+                    isRevealed = toggle,
+                    cardOffset = -200f,
+                    onExpand = { toggle = true },
+                    onCollapse = { toggle = false }
+                )
+            }
+
+//            Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
+
+//            val ds = rememberDismissState()
+//
+//            if (ds.isDismissed(DismissDirection.EndToStart)) {
+//                val temp = arrayListOf<StopPlacesByBoundaryQuery.StopPlacesByBbox?>()
+//                favouriteStops?.forEach { stop ->
+//                    temp.add(stop)
+//                }
+//                temp.remove(heh)
+//
+//                settingsViewModel.favouriteStops.postValue(temp)
+//            }
+//
+//
+//           SwipeToDismiss(
+//               modifier = Modifier,
+//               state = ds,
+//               directions = setOf(DismissDirection.EndToStart),
+//               background = {
+//
+////                   if (ds.isDismissed(DismissDirection.EndToStart)) {
+////
+////                       LaunchedEffect(key1 = 1) {
+////                           CoroutineScope(Dispatchers.Main).launch {
+////
+////                               ds.animateTo(Diss)
+////                           }
+////                       }
+////                   }
+//
+//                   Box(
+//                       contentAlignment = Alignment.CenterEnd,
+//                       modifier = Modifier
+//                           .fillMaxSize()
+//                           .padding(Constants.PADDING_INNER)
+//                   ) {
+//                       Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
+//                   }
+//               },
+//           ) {
+//               Card(
+//                   elevation = 10.dp,
+//                   backgroundColor = MaterialTheme.colors.secondary,
+//                   modifier = Modifier
+//                       .padding(Constants.PADDING_INNER)
+//                       .fillMaxWidth()
+//               ) {
+//                    Text(
+//                        text = heh?.name ?: "",
+//                        color = MaterialTheme.colors.onSecondary,
+//                        modifier = Modifier
+//                            .padding(Constants.PADDING_INNER)
+//                    )
+//               }
+//               Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
+//           }
        }
 
     }

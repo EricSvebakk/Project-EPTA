@@ -14,7 +14,7 @@ import no.tepohi.projectepta.ui.sources.AutoCompleteSource
 import no.tepohi.projectepta.ui.sources.GeocodeSource
 import no.tepohi.projectepta.ui.sources.Result
 
-class SearchViewModel : ViewModel() {
+class AutoCompleteViewModel : ViewModel() {
 
     // sources
     private val autocompleteSource = AutoCompleteSource()
@@ -25,8 +25,10 @@ class SearchViewModel : ViewModel() {
     val searchFromText = MutableLiveData("")
     val searchToText = MutableLiveData("")
 
-    //
+    // suggestions
     val autoCompleteSuggestions = MutableLiveData(mutableListOf<AutocompletePrediction>())
+
+    //
     val toPlaceResult = MutableLiveData<Result>()
     val fromPlaceResult = MutableLiveData<Result>()
     val departurePlaceResult = MutableLiveData<Result>()
@@ -43,13 +45,13 @@ class SearchViewModel : ViewModel() {
 //        startPointData: MutableLiveData<Result>
     ) {
 
-        autocompleteSource.fetchAutoCompleteSearch(
-            context = context,
-            query = query,
-            searchViewModel = this,
-//            mavm = mavm,
-//            idk = startPointData
-        )
+//        autocompleteSource.fetchAutoCompleteSearch(
+//            context = context,
+//            query = query,
+//            searchViewModel = this,
+////            mavm = mavm,
+////            idk = startPointData
+//        )
     }
 
     /**
@@ -90,21 +92,13 @@ class SearchViewModel : ViewModel() {
 //        return placeResult
     }
 
-    fun departurePlaceResult(sd: StopPlacesByBoundaryQuery.StopPlacesByBbox?) {
+    fun DeparturePlaceResult(placeID: String) {
 
-        if (sd != null) {
-            if (sd.latitude!! > 0 && sd.longitude!! > 0.0) {
-                departurePlaceResult.postValue(Result(sd.name, LatLng(sd.latitude, sd.longitude)))
-            }
-            else {
-                viewModelScope.launch(Dispatchers.IO) {
-                    geocodeSource.fetchGeoLocation(placeID = sd.id)
-                        .also { departurePlaceResult.postValue(it) }
-                }
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            geocodeSource.fetchGeoLocation(placeID = placeID)
+                .also { departurePlaceResult.postValue(it) }
         }
 //        return placeResult
     }
 
 }
-

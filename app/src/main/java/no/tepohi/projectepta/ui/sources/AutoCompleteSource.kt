@@ -50,30 +50,11 @@ class AutoCompleteSource {
             .addOnSuccessListener { response: FindAutocompletePredictionsResponse ->
 
                 val ids = response.autocompletePredictions //.map { it.placeId }.toMutableList()
+
 //                Log.d("loadPlaces fetchAutoCompleteSearch", ids.toString())
 
-//                idk.postValue(ids)
 
                 searchViewModel.autoCompleteSuggestions.postValue(ids)
-
-                val temp = ArrayList<StopData>()
-
-                ids.forEach { sp ->
-
-                    temp.add(
-                        StopData(
-                            sp.getPrimaryText(null).toString(),
-                            sp.placeId,
-                            -0.0,
-                            -0.0
-                        )
-                    )
-                }
-
-//                searchViewModel.loadPlaces(ids)
-
-//                mavm.startPointData.postValue()
-
 
 //                for (prediction in response.autocompletePredictions) {
 //                    Log.i(ContentValues.TAG, prediction.getPrimaryText(null).toString())

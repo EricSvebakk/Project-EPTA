@@ -12,13 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import no.tepohi.projectepta.ui.sources.StopData
+import no.tepohi.example.StopPlacesByBoundaryQuery
 import no.tepohi.projectepta.ui.theme.Constants
+import no.tepohi.projectepta.ui.theme.EptaTheme
 import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
 import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
-import no.tepohi.projectepta.ui.theme.EptaTheme
 import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
-import java.lang.NumberFormatException
 
 class MainActivity : ComponentActivity() {
 
@@ -66,30 +65,22 @@ class MainActivity : ComponentActivity() {
 
         val sp = this.getSharedPreferences("EptaPreferences", MODE_PRIVATE)
 
+        val data = sp.getStringSet("favouriteStops", emptySet())!!.map {
 
-        settingsViewModel.appColorPalette.postValue(sp.getString("appColorPalette", Constants.THEME_SYSTEM))
+            val temp = it.split(",")
 
-        val data = mutableListOf<StopData>()
-        sp.getStringSet("favouriteStops", emptySet())?.forEach { stop ->
-
-            val temp = stop.split(",")
-
-            try {
-                data.add(
-                    StopData(
-                        temp[0],
-                        temp[1],
-                        temp[2].toDouble(),
-                        temp[3].toDouble()
-                    )
-                )
-            }
-            catch (err: NumberFormatException) {
-                Log.e("sharedPref", temp.toString())
-            }
+            StopPlacesByBoundaryQuery.StopPlacesByBbox(
+                temp[0],
+                temp[1],
+                temp[2].toDouble(),
+                temp[3].toDouble()
+            )
         }
 
+        Log.d("SharedPref resume", data.toString())
+
         settingsViewModel.favouriteStops.postValue(data)
+        settingsViewModel.appColorPalette.postValue(sp.getString("appColorPalette", Constants.THEME_SYSTEM))
     }
 
     override fun onPause() {
@@ -98,10 +89,13 @@ class MainActivity : ComponentActivity() {
         val sp = this.getSharedPreferences("EptaPreferences", MODE_PRIVATE)
         val edit = sp.edit()
 
+
         val data = mutableSetOf<String>()
         settingsViewModel.favouriteStops.value?.forEach { stop ->
-            data.add("${stop.name},${stop.id},${stop.latitude},${stop.longitude}")
+            data.add("${stop?.name},${stop?.id},${stop?.latitude},${stop?.longitude}")
         }
+
+        Log.d("SharedPref pause", data.toString())
 
         edit.putStringSet("favouriteStops", data)
         edit.putString("appColorPalette", settingsViewModel.appColorPalette.value ?: Constants.THEME_SYSTEM)

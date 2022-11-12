@@ -32,24 +32,23 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.libraries.places.api.model.AutocompletePrediction
-import no.tepohi.projectepta.ui.sources.StopData
+import no.tepohi.example.StopPlacesByBoundaryQuery
 import no.tepohi.projectepta.ui.theme.Constants
 import no.tepohi.projectepta.ui.theme.customTextFieldColors
-import no.tepohi.projectepta.ui.theme.testColor
 
 @Composable
 fun CustomAutoComplete(
     value: String,
     label: String,
     textSize: TextUnit = 14.sp,
-    dropdownItems: List<StopData>,
+    dropdownItems: List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>,
     dropdownHeight: Dp = 180.dp,
     onValueChange: (String) -> Unit,
-    onDoneAction: (StopData) -> Unit,
+    onDoneAction: (StopPlacesByBoundaryQuery.StopPlacesByBbox?) -> Unit,
     focusRequester: FocusRequester,
     nextFocusRequester: FocusRequester? = null,
     interactionSource: MutableInteractionSource = MutableInteractionSource(),
+    enabled: Boolean = true,
 //    trailingIcon: @Composable () -> Unit,
 ) {
 
@@ -89,6 +88,7 @@ fun CustomAutoComplete(
             colors = customTextFieldColors(),
             singleLine = true,
             interactionSource = interactionSource,
+            enabled = enabled,
             textStyle = TextStyle(
                 fontSize = textSize
             ),
@@ -110,7 +110,7 @@ fun CustomAutoComplete(
                 onDone = {
                     if (itemsFiltered.isNotEmpty()) {
 //                        onValueChange(itemsFiltered[0].getPrimaryText(null).toString())
-                        onValueChange(itemsFiltered[0].name)
+                        onValueChange(itemsFiltered[0]?.name ?: "")
                         onDoneAction(itemsFiltered[0])
                     }
                     if (nextFocusRequester != null) {
@@ -195,14 +195,13 @@ fun CustomAutoComplete(
                     itemsFiltered.forEach { content ->
                         Text(
 //                            text = content.getPrimaryText(null).toString(),
-                            text = content.name,
+                            text = content?.name ?: "",
                             fontSize = textSize,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
                                     onValueChange(
-                                        content
-                                            .name
+                                        content?.name ?: ""
 //                                            .getPrimaryText(null)
 //                                            .toString()
                                     )
@@ -223,15 +222,14 @@ fun CustomAutoComplete(
 
 }
 
-private fun List<StopData>.autoCompleteFilter(query: String): List<StopData> {
+fun List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>.autoCompleteFilter(query: String): List<StopPlacesByBoundaryQuery.StopPlacesByBbox?> {
 
     return if (query.isBlank()) {
         this
     } else {
-        this.filter { text: StopData ->
+        this.filter { text: StopPlacesByBoundaryQuery.StopPlacesByBbox? ->
 
-            text.name.toLowerCase(Locale.current)
-                .startsWith(query.toLowerCase(Locale.current))
+            text?.name?.toLowerCase(Locale.current)?.startsWith(query.toLowerCase(Locale.current)) ?: false
 
 //            text.getPrimaryText(null).toString().toLowerCase(Locale.current)
 //                .startsWith(query.toLowerCase(Locale.current))
