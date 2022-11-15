@@ -3,7 +3,10 @@ query FindTripQuery(
   $fromLon: Float!,
   $toLat: Float!,
   $toLon: Float!,
-  $date: DateTime
+  $date: DateTime,
+  $accessMode: StreetMode,
+  $egressMode: StreetMode,
+  $transportModes: [TransportModes],
 ) {
   trip(
     from: {
@@ -18,8 +21,13 @@ query FindTripQuery(
         longitude: $toLon
       }
     }
-    numTripPatterns: 3
+    numTripPatterns: 12
     dateTime: $date
+    modes: {
+      accessMode: $accessMode,
+      egressMode: $egressMode,
+      transportModes: $transportModes
+    }
   ) {
     tripPatterns {
       expectedStartTime
@@ -30,7 +38,6 @@ query FindTripQuery(
         expectedEndTime
         duration
         distance
-
         fromPlace {
           name
         }
@@ -51,22 +58,13 @@ query FindTripQuery(
           quay {
             name
           }
+          destinationDisplay {
+            frontText
+          }
         }
         pointsOnLink {
           points
         }
-      }
-    }
-    fromPlace {
-      name
-      quay {
-        name
-      }
-    }
-    toPlace {
-      name
-      quay {
-        name
       }
     }
   }

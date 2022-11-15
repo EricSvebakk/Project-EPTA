@@ -1,4 +1,4 @@
-package no.tepohi.projectepta.ui.components
+package no.tepohi.projectepta.ui.components.entur
 
 import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
@@ -24,7 +24,7 @@ fun TripLine(
     endText: String = "",
     endTime: String = "",
     lineExpanded: Boolean = true,
-    canvasWidth: Dp = 50.dp,
+    canvasWidth: Dp = 90.dp,
     canvasHeight: Dp = 100.dp,
     textColor: Int = MaterialTheme.colors.onSurface.toArgb()
 ) {

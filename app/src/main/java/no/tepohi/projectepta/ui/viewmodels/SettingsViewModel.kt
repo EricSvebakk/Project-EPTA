@@ -3,7 +3,9 @@ package no.tepohi.projectepta.ui.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import no.tepohi.example.StopPlacesByBoundaryQuery
+import no.tepohi.example.type.TransportMode
 import no.tepohi.projectepta.ui.theme.Constants
+import no.tepohi.projectepta.ui.theme.Constants.Companion.allTransports
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,7 +29,12 @@ class SettingsViewModel: ViewModel() {
     val showPopUp = MutableLiveData(false)
 
     val favouriteStops = MutableLiveData<List<StopPlacesByBoundaryQuery.StopPlacesByBbox?>>()
-    val showPopUpfavouriteStop = MutableLiveData(false)
+    val showPopUpFavouriteStop = MutableLiveData(false)
+
+    val showFilterOptions = MutableLiveData(false)
+    val filter = MutableLiveData(allTransports.filter { it.tm != null }.map { it.tm }.toSet())
+
+    val showFromSearch = MutableLiveData(true)
 
     fun resetDateTime() {
         println(dateTime.value)

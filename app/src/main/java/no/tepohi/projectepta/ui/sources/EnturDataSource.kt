@@ -2,11 +2,15 @@ package no.tepohi.projectepta.ui.sources
 
 import android.util.Log
 import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo3.api.Optional
 import com.google.android.gms.maps.model.LatLng
 import no.tepohi.example.DepartureBoardQuery
 import no.tepohi.example.FindTripQuery
 import no.tepohi.example.StopPlacesByBoundaryQuery
 import no.tepohi.example.StopsQuery
+import no.tepohi.example.type.StreetMode
+import no.tepohi.example.type.TransportMode
+import no.tepohi.example.type.TransportModes
 import java.lang.Exception
 
 class EnturDataSource {
@@ -45,8 +49,11 @@ class EnturDataSource {
     suspend fun fetchTrips(
         fromLatLng: LatLng,
         toLatLng: LatLng,
-        time: String
+        time: String,
+        modes: List<TransportMode?>? = null
     ): List<FindTripQuery.TripPattern> {
+
+        val tm = modes?.map { TransportModes(Optional.presentIfNotNull(it)) }
 
         val response = try {
             val query = FindTripQuery(
@@ -55,6 +62,9 @@ class EnturDataSource {
                 toLat = toLatLng.latitude,
                 toLon = toLatLng.longitude,
                 date = time,
+                accessMode = StreetMode.flexible,
+                egressMode = StreetMode.flexible,
+                transportModes = tm
             )
 
             Log.d("fetchTrips tag", query.toString())

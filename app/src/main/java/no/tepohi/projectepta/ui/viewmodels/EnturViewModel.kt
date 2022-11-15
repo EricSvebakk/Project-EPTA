@@ -11,10 +11,10 @@ import kotlinx.coroutines.launch
 import no.tepohi.example.DepartureBoardQuery
 import no.tepohi.example.FindTripQuery
 import no.tepohi.example.StopPlacesByBoundaryQuery
+import no.tepohi.example.type.TransportMode
 import no.tepohi.projectepta.ui.sources.EnturDataSource
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.sqrt
 
 class EnturViewModel: ViewModel() {
@@ -43,9 +43,10 @@ class EnturViewModel: ViewModel() {
     fun loadTrips(
         start: LatLng,
         end: LatLng,
+        modes: List<TransportMode?>,
         time: Calendar = Calendar.getInstance()
     ) {
-        val timeString = SimpleDateFormat("yyyy-MM-dd\'T\'HH:mm:ssXXX").format(time.time)
+        val timeString = SimpleDateFormat("yyyy-MM-dd\'T\'HH:mm:ssXXX", Locale.getDefault()).format(time.time)
 
 //        Log.d("sdv", stopsData.value.toString())
 
@@ -55,50 +56,51 @@ class EnturViewModel: ViewModel() {
 
         Log.d("start/end", "$start $end")
 
-        if (stopsData.value != null) {
-
-            var startClosest = stopsData.value!![0]!!
-            var startBestDistance = Double.POSITIVE_INFINITY
-
-            var endClosest = stopsData.value!![0]!!
-            var endBestDistance = Double.POSITIVE_INFINITY
-
-            stopsData.value!!.forEach { next ->
-                if (next != null) {
-
-                    val startDist = start.distanceTo(
-                        latitude = next.latitude ?: 0.0,
-                        longitude = next.longitude ?: 0.0
-                    )
-
-                    if (startDist < startBestDistance) {
-                        startBestDistance = startDist
-                        startClosest = next
-                    }
-
-                    val endDist = end.distanceTo(
-                        latitude = next.latitude ?: 0.0,
-                        longitude = next.longitude ?: 0.0
-                    )
-
-                    if (endDist < endBestDistance) {
-                        endBestDistance = endDist
-                        endClosest = next
-                    }
-                }
-            }
-
-            Log.d("closest", "${startClosest.name} ${endClosest.name}")
-
-            viewModelScope.launch(Dispatchers.IO) {
-                dataSource.fetchTrips(
-                    fromLatLng = LatLng(startClosest.latitude!!, startClosest.longitude!!),
-                    toLatLng = LatLng(endClosest.latitude!!, endClosest.longitude!!),
-                    time = timeString,
+//        if (stopsData.value != null) {
+//
+//            var startClosest = stopsData.value!![0]!!
+//            var startBestDistance = Double.POSITIVE_INFINITY
+//
+//            var endClosest = stopsData.value!![0]!!
+//            var endBestDistance = Double.POSITIVE_INFINITY
+//
+//            stopsData.value!!.forEach { next ->
+//                if (next != null) {
+//
+//                    val startDist = start.distanceTo(
+//                        latitude = next.latitude ?: 0.0,
+//                        longitude = next.longitude ?: 0.0
+//                    )
+//
+//                    if (startDist < startBestDistance) {
+//                        startBestDistance = startDist
+//                        startClosest = next
+//                    }
+//
+//                    val endDist = end.distanceTo(
+//                        latitude = next.latitude ?: 0.0,
+//                        longitude = next.longitude ?: 0.0
+//                    )
+//
+//                    if (endDist < endBestDistance) {
+//                        endBestDistance = endDist
+//                        endClosest = next
+//                    }
+//                }
+//            }
+//
+//            Log.d("closest", "${startClosest.name} ${endClosest.name}")
+//
+//        }
+        viewModelScope.launch(Dispatchers.IO) {
+            dataSource.fetchTrips(
+                fromLatLng = start, // LatLng(startClosest.latitude!!, startClosest.longitude!!),
+                toLatLng = end, // LatLng(endClosest.latitude!!, endClosest.longitude!!),
+                time = timeString,
+                modes = modes
 //                    startClosest.name, endClosest.name, timeString
-                ).also {
-                    tripsData.postValue(it)
-                }
+            ).also {
+                tripsData.postValue(it)
             }
         }
 

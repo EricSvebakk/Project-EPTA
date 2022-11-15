@@ -1,28 +1,22 @@
-package no.tepohi.projectepta.ui.components
+package no.tepohi.projectepta.ui.components.entur
 
-import android.util.Log
-import androidx.compose.animation.*
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import no.tepohi.example.FindTripQuery
 import no.tepohi.projectepta.ui.theme.Constants
 import no.tepohi.projectepta.ui.theme.Transports
@@ -31,7 +25,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun ShowLeg(
+fun TripLeg(
     leg:  FindTripQuery.Leg?,
     item: Transports,
     color: Color
@@ -82,10 +76,10 @@ fun ShowLeg(
 //                    enter = expandVertically(expandFrom = Alignment.Top),
 //                    exit = shrinkVertically(shrinkTowards = Alignment.Top),
                     enter = slideIn(
-                        initialOffset = { inoff -> IntOffset( 0, inoff.height) }
+                        initialOffset = { inoff -> IntOffset( 0, -inoff.height) }
                     ),
                     exit = slideOut(
-                        targetOffset = { inoff -> IntOffset(0, inoff.height) }
+                        targetOffset = { inoff -> IntOffset(0, -inoff.height) }
                     ),
                     modifier = Modifier
                         .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
@@ -100,48 +94,17 @@ fun ShowLeg(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.CenterEnd
         ) {
+            val modeFoot = item.mode != Transports.Foot.mode
 
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 50.dp)
-                    .width(78.dp)
-                    .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                    .background(color, RoundedCornerShape(4.dp))
-                    .padding(2.dp)
-            ) {
-
-                Image(
-                    modifier = Modifier
-                        .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                    ,
-                    painter = painterResource(id = item.iconTableId),
-                    contentDescription = item.mode,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.background)
-                )
-
-                val modeFoot = item.mode != Transports.Foot.mode
-
-                val text = if (modeFoot) {
+            TransportLabel(
+                item = item,
+                color = color,
+                text = if (modeFoot) {
                     leg?.line?.publicCode.toString()
                 } else {
                     "${(leg?.duration.toString().toInt() / 60.0).toInt()} min"
-                }
-
-                Text(
-                    modifier = Modifier
-                        .weight(1f)
-                        .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                    ,
-                    textAlign = TextAlign.Center,
-                    text = text,
-                    color = MaterialTheme.colors.background,
-                    fontSize = 14.sp
-                )
-
-                // symbol end
-            }
+                },
+            )
         }
 
     // box end

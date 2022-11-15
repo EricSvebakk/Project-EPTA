@@ -1,4 +1,4 @@
-package no.tepohi.projectepta.ui.components
+package no.tepohi.projectepta.ui.components.entur
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.gms.maps.model.LatLng
 import no.tepohi.example.FindTripQuery
-import no.tepohi.projectepta.ui.screens.decode
+import no.tepohi.projectepta.ui.components.CustomButton
+import no.tepohi.projectepta.ui.methods.decode
 import no.tepohi.projectepta.ui.theme.Constants
-import no.tepohi.projectepta.ui.theme.Transports
 import no.tepohi.projectepta.ui.theme.testColor
 import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
@@ -30,15 +30,7 @@ fun TravelResultCard(
     settingsViewModel: SettingsViewModel
 ) {
 
-    val items = listOf(
-        Transports.Foot,
-        Transports.Bus,
-        Transports.Tram,
-        Transports.Metro,
-        Transports.Rail,
-    )
-
-    var polylines: ArrayList<polyline> = arrayListOf()
+    val polylines: ArrayList<polyline> = arrayListOf()
 
     Card(
         elevation = 10.dp
@@ -60,12 +52,12 @@ fun TravelResultCard(
                     horizontalAlignment = Alignment.Start,
                     modifier = Modifier
                         .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                        .padding(Constants.PADDING_INNER + 10.dp)
+                        .padding(Constants.PADDING_INNER)
                 ) {
 
                     tripPattern.legs.forEach { leg ->
 
-                        val item = items.find { it.mode == leg?.mode.toString() }!!
+                        val item = Constants.allTransports.find { it.mode == leg?.mode.toString() }!!
 
                         val result = decode(leg?.pointsOnLink?.points.toString())
                         val hex = leg?.line?.presentation?.colour
@@ -81,7 +73,7 @@ fun TravelResultCard(
                             item.iconMapId
                         )
 
-                        ShowLeg(leg, item, c)
+                        TripLeg(leg, item, c)
                         polylines.add(pl)
                     }
                 }
@@ -119,6 +111,7 @@ fun TravelResultCard(
                     onClick = {
                         searchViewModel.polylines.postValue(polylines)
                         settingsViewModel.showTripsData.postValue(false)
+                        settingsViewModel.showFromSearch.postValue(false)
                     }
                 )
             }

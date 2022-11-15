@@ -7,21 +7,23 @@ query DepartureBoardQuery(
       aimedArrivalTime
       expectedArrivalTime
       serviceJourney {
-        journeyPattern {
-          line {
-            id
-            name
-            transportMode
-            publicCode
-            presentation {
-              colour
-              textColour
-            }
-          }
-          pointsOnLink {
-            points
+        directionType
+        line {
+          id
+          name
+          transportMode
+          publicCode
+          presentation {
+            colour
+            textColour
           }
         }
+      }
+      destinationDisplay {
+        frontText
+      }
+      quay {
+        publicCode
       }
     }
   }

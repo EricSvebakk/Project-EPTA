@@ -1,4 +1,4 @@
-package no.tepohi.projectepta.ui.screens
+package no.tepohi.projectepta.ui.methods
 
 import android.animation.ObjectAnimator
 import android.graphics.Rect

@@ -1,4 +1,4 @@
-package no.tepohi.projectepta.ui.screens
+package no.tepohi.projectepta.ui.methods
 
 import com.google.android.gms.maps.model.LatLng
 import kotlin.math.abs

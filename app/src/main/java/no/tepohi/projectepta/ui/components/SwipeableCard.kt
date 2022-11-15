@@ -1,4 +1,4 @@
-package no.tepohi.projectepta.ui.screens
+package no.tepohi.projectepta.ui.components
 
 //package com.skyyo.draggable.cards
 

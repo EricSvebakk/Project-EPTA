@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,9 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -36,10 +32,12 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import no.tepohi.projectepta.R
 import no.tepohi.projectepta.ui.components.*
+import no.tepohi.projectepta.ui.components.entur.TransportLabel
+import no.tepohi.projectepta.ui.components.entur.TravelResultCard
 import no.tepohi.projectepta.ui.theme.Constants
+import no.tepohi.projectepta.ui.theme.Constants.Companion.allTransports
 import no.tepohi.projectepta.ui.theme.Constants.Companion.gesturesDisabled
 import no.tepohi.projectepta.ui.theme.testColor
 import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
@@ -62,7 +60,7 @@ fun TravelScreen(
 
     val mapProperties = MapProperties(
         latLngBoundsForCameraTarget = LatLngBounds(
-            Constants. MAP_BOUNDS_SW,
+            Constants.MAP_BOUNDS_SW,
             Constants.MAP_BOUNDS_NE
         ),
         minZoomPreference = 10f,
@@ -86,14 +84,11 @@ fun TravelScreen(
             }
         }
 
-        LaunchedEffect(key1 = 1) {
+        LaunchedEffect(key1 = idk3) {
             CoroutineScope(Dispatchers.Main).launch {
 
                 cameraPosition.animate(
-                    CameraUpdateFactory.newLatLngBounds(idk3.build(), 800, 1100, 0)
-                )
-                cameraPosition.animate(
-                    CameraUpdateFactory.scrollBy(0f, -250f)
+                    CameraUpdateFactory.newLatLngBounds(idk3.build(), 800, 1400, 0)
                 )
             }
         }
@@ -101,8 +96,11 @@ fun TravelScreen(
     }
 
     val showTripsData by settingsViewModel.showTripsData.observeAsState()
-    val showPopUp by settingsViewModel.showPopUpfavouriteStop.observeAsState()
+    val showPopUp by settingsViewModel.showPopUpFavouriteStop.observeAsState()
+    val showFilterOptions by settingsViewModel.showFilterOptions.observeAsState()
     val favouriteStops by settingsViewModel.favouriteStops.observeAsState()
+
+    val currentLocation by searchViewModel.currentLocation.observeAsState()
 
     val uiSettings = MapUiSettings(
         rotationGesturesEnabled = false,
@@ -153,6 +151,19 @@ fun TravelScreen(
                 )
             }
 
+//            if (currentLocation != null) {
+//                CustomMapMarker(
+//                    context = context,
+//                    position = currentLocation!!,
+//                    title = "YOU!",
+//                    iconResourceId = R.drawable.icon_map_train_36,
+//                    onInfoWindowClick = {
+//                        settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
+//                        searchViewModel.searchTempText.postValue("Your position")
+//                    }
+//                )
+//            }
+
             var temp: LatLngBounds? = null
             try {
                 temp = idk3.build()
@@ -169,7 +180,8 @@ fun TravelScreen(
                         temp.northeast,
                         LatLng(temp.northeast.latitude, temp.southwest.longitude),
                         temp.southwest,
-                    )
+                    ),
+                    color = testColor
                 )
             }
 
@@ -179,8 +191,8 @@ fun TravelScreen(
                     position = LatLng(stop?.latitude ?: 0.0, stop?.longitude ?: 0.0),
                     title = stop?.name ?: "",
                     iconResourceId = R.drawable.icon_map_end_36,
-                    onClick = {
-                        settingsViewModel.showPopUpfavouriteStop.postValue(!showPopUp!!)
+                    onInfoWindowClick = {
+                        settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
                         searchViewModel.searchTempText.postValue(stop?.name)
                     }
                 )
@@ -226,7 +238,7 @@ fun TravelScreen(
                 alignment = Alignment.Center,
                 properties = PopupProperties(dismissOnBackPress = true),
                 onDismissRequest = {
-                    settingsViewModel.showPopUpfavouriteStop.postValue(!showPopUp!!)
+                    settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
                 }
             ) {
                 Card(
@@ -240,14 +252,14 @@ fun TravelScreen(
                             content = "from",
                             onClick = {
                                 searchViewModel.searchFromText.postValue(searchViewModel.searchTempText.value)
-                                settingsViewModel.showPopUpfavouriteStop.postValue(!showPopUp!!)
+                                settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
                             }
                         )
                         CustomButton(
                             content = "to",
                             onClick = {
                                 searchViewModel.searchToText.postValue(searchViewModel.searchTempText.value)
-                                settingsViewModel.showPopUpfavouriteStop.postValue(!showPopUp!!)
+                                settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
                             }
                         )
                     }
@@ -255,8 +267,110 @@ fun TravelScreen(
             }
         }
 
+        if (showFilterOptions == true) {
+            Popup(
+                alignment = Alignment.Center,
+                properties = PopupProperties(dismissOnBackPress = true),
+                onDismissRequest = {
+                    settingsViewModel.showFilterOptions.postValue(!showFilterOptions!!)
+                }
+            ) {
+                Card(
+                    elevation = 10.dp,
+                    modifier = Modifier
+                        .height(220.dp)
+                        .width(280.dp)
+                ) {
+                    Box(
+                        contentAlignment = Alignment.TopEnd,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        IconButton(
+                            content = {
+                                Icon(imageVector = Icons.Filled.Clear, contentDescription = "Clear")
+                            },
+                            onClick = {
+                                settingsViewModel.showFilterOptions.postValue(false)
+                            },
+                            modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS)
+                            )
+                        )
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        
+                        Text(text = "Select transports:")
+                        Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
+
+                        val filter by settingsViewModel.filter.observeAsState()
+
+                        val sub = allTransports.filter { it.tm != null }
+
+                        listOf(
+                            sub.subList(0, (allTransports.size/2)),
+                            sub.subList((allTransports.size/2), allTransports.size-1)
+                        ).forEach {
+
+                            Row(
+                                modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                            ) {
+                                it.forEach {
+                                    var toggle by remember { mutableStateOf(true) }
+
+                                    TextButton(
+                                        onClick = {
+                                            toggle = !toggle
+                                            val temp = filter?.toMutableSet() ?: mutableSetOf()
+
+                                            if (toggle) {
+                                                temp.add(it.tm!!)
+                                            } else {
+                                                temp.remove(it.tm!!)
+                                            }
+                                            Log.d("filter tag", temp.toString())
+                                            settingsViewModel.filter.postValue(temp)
+                                        },
+                                        modifier = Modifier
+                                            .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
+                                    ) {
+                                        TransportLabel(
+                                            item = it,
+                                            color = if (toggle) it.color else Color.Gray,
+                                            text = it.mode,
+                                            width = 120.dp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+
+
+                    }
+
+
+//                    Button(
+//                        onClick = { toggle = !toggle },
+//                        colors = ButtonDefaults.buttonColors(
+//                            backgroundColor = Color.Transparent,
+//                            contentColor = Color.Transparent,
+//                        ),
+//                        elevation = null,
+//                        border = BorderStroke(2.dp, testColor),
+//                        contentPadding = PaddingValues(0.dp)
+//                    ) {
+//                    }
+                }
+            }
+        }
+
+
+
         AnimatedVisibility(
-            visible = (showPopUp ?: false) || (showTripsData ?: false),
+            visible = (showPopUp ?: false) || (showTripsData ?: false) || (showFilterOptions ?: false),
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier
@@ -283,8 +397,6 @@ fun TravelSearchbar(
     val focusRequester1 = remember { FocusRequester() }
     val focusRequester2 = remember { FocusRequester() }
 
-    val context = LocalContext.current
-
     var searchTextFrom by remember { mutableStateOf("Stortinget") }
     var searchTextTo by remember { mutableStateOf("Ullevål stadion") }
 
@@ -295,14 +407,11 @@ fun TravelSearchbar(
     val showDatePicker by settingsViewModel.showDatePicker.observeAsState()
 
     val show by settingsViewModel.showTripsData.observeAsState()
+    val showFilter by settingsViewModel.showFilterOptions.observeAsState()
+
+    val showFromSearch by settingsViewModel.showFromSearch.observeAsState()
 
     val allStops by enturViewModel.stopsData.observeAsState()
-
-    val mis = MutableInteractionSource()
-
-//    mis.tryEmit(
-//        PressInteraction.Press
-//    )
 
     if (!searchViewModel.searchFromText.value.equals("")) {
         searchTextFrom = searchViewModel.searchFromText.value ?: ""
@@ -321,8 +430,6 @@ fun TravelSearchbar(
             allStops?.autoCompleteFilter(searchTextTo)?.get(0)
         )
     }
-
-//    val autoCompleteSuggestions by searchViewModel.newStopData.observeAsState()
 
     if(showTimePicker == true) {
         CustomTimePicker(
@@ -352,9 +459,8 @@ fun TravelSearchbar(
         Modifier
             .padding(Constants.PADDING_OUTER)
             .fillMaxWidth()
-//            .zIndex(101f)
             .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-            .gesturesDisabled(show ?: false)
+            .gesturesDisabled((show ?: false) || (showFilter ?: false))
     ) {
 
         Column (
@@ -363,84 +469,89 @@ fun TravelSearchbar(
 //            contentAlignment = Alignment.CenterEnd
         ) {
 
-            Box(
-                contentAlignment = Alignment.CenterEnd
+            AnimatedVisibility(
+                visible = showFromSearch == true,
+                enter = expandVertically(expandFrom = Alignment.Top),
+                exit = shrinkVertically(shrinkTowards = Alignment.Top)
             ) {
-                Column {
-                    CustomAutoComplete(
-                        value = searchTextFrom ?: "",
-                        label = "from",
-//                        dropdownItems = autoCompleteSuggestions ?: allstops ?: emptyList(),
-                        dropdownItems = allStops ?: emptyList(),
-                        focusRequester = focusRequester1,
-                        nextFocusRequester = focusRequester2,
-                        onValueChange = { searchString ->
-                            searchTextFrom = searchString
-//                            searchViewModel.loadAutoCompleteSuggestions(context, searchTextFrom)
-                        },
-                        onDoneAction = { ACP ->
-                            Log.d("top DONE", ACP.toString())
-
-                            if (ACP?.id != "") {
-                                searchViewModel.fromLoadPlaceResult(ACP)
-                            }
-
-                        },
-                        interactionSource = mis
-                    )
-
-                    Spacer(modifier = Modifier.height(5.dp))
-                    
-                    CustomAutoComplete(
-                        value = searchTextTo ?: "",
-                        label = "to",
-//                        dropdownItems = autoCompleteSuggestions ?: allstops ?: emptyList(),
-                        dropdownItems = allStops ?: emptyList(),
-                        dropdownHeight = 180.dp,
-                        focusRequester = focusRequester2,
-                        onValueChange = { searchString ->
-                            searchTextTo = searchString
-//                            searchViewModel.loadAutoCompleteSuggestions(context, searchTextTo)
-                        },
-                        onDoneAction = { ACP ->
-                            Log.d("bottom DONE", ACP.toString())
-
-                            if (ACP?.id != "") {
-                                searchViewModel.toLoadPlaceResult(ACP)
-                            }
-
-                        },
-                    )
-                }
-
                 Box(
-                    modifier = Modifier
-                        .padding(end = 36.dp)
+                    contentAlignment = Alignment.CenterEnd
                 ) {
+                    Column {
+                        CustomAutoComplete(
+                            value = searchTextFrom,
+                            label = "from",
+    //                        dropdownItems = autoCompleteSuggestions ?: allstops ?: emptyList(),
+                            dropdownItems = allStops ?: emptyList(),
+                            focusRequester = focusRequester1,
+                            nextFocusRequester = focusRequester2,
+                            onValueChange = { searchString ->
+                                searchTextFrom = searchString
+    //                            searchViewModel.loadAutoCompleteSuggestions(context, searchTextFrom)
+                            },
+                            onDoneAction = { ACP ->
+                                Log.d("top DONE", ACP.toString())
 
-                    IconButton(
+                                if (ACP?.id != "") {
+                                    searchViewModel.fromLoadPlaceResult(ACP)
+                                }
+
+                            },
+                        )
+
+                        Spacer(modifier = Modifier.height(5.dp))
+
+                        CustomAutoComplete(
+                            value = searchTextTo,
+                            label = "to",
+    //                        dropdownItems = autoCompleteSuggestions ?: allstops ?: emptyList(),
+                            dropdownItems = allStops ?: emptyList(),
+                            dropdownHeight = 180.dp,
+                            focusRequester = focusRequester2,
+                            onValueChange = { searchString ->
+                                searchTextTo = searchString
+    //                            searchViewModel.loadAutoCompleteSuggestions(context, searchTextTo)
+                            },
+                            onDoneAction = { ACP ->
+                                Log.d("bottom DONE", ACP.toString())
+
+                                if (ACP?.id != "") {
+                                    searchViewModel.toLoadPlaceResult(ACP)
+                                }
+
+                            },
+                        )
+                    }
+
+                    Box(
                         modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colors.background,
-                                shape = RoundedCornerShape(Constants.CORNER_RADIUS + 15.dp)
-                            )
-                            .border(
-                                width = 1.5.dp,
-                                color = MaterialTheme.colors.onBackground,
-                                shape = RoundedCornerShape(Constants.CORNER_RADIUS + 15.dp)
-                            )
-                            .size(30.dp)
-                            .zIndex(102f)
-                        ,
-                        content = {
-                            Icon(imageVector = Icons.Filled.SwapVert, contentDescription = "SwapVert", tint = MaterialTheme.colors.onBackground)
-                        },
-                        onClick = {
-                            val temp = searchTextFrom
-                            searchTextFrom = searchTextTo
-                            searchTextTo = temp ?: ""
-                        },
-                    )
+                            .padding(end = 36.dp)
+                    ) {
+
+                        IconButton(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colors.background,
+                                    shape = RoundedCornerShape(Constants.CORNER_RADIUS + 15.dp)
+                                )
+                                .border(
+                                    width = 1.5.dp,
+                                    color = MaterialTheme.colors.onBackground,
+                                    shape = RoundedCornerShape(Constants.CORNER_RADIUS + 15.dp)
+                                )
+                                .size(30.dp)
+                                .zIndex(102f)
+                            ,
+                            content = {
+                                Icon(imageVector = Icons.Filled.SwapVert, contentDescription = "SwapVert", tint = MaterialTheme.colors.onBackground)
+                            },
+                            onClick = {
+                                val temp = searchTextFrom
+                                searchTextFrom = searchTextTo
+                                searchTextTo = temp
+                            },
+                        )
+                    }
                 }
             }
 
@@ -466,18 +577,18 @@ fun TravelSearchbar(
                 },
                 onClick = {
 
-                    focusRequester1.freeFocus()
-                    focusRequester2.freeFocus()
-
                     val toPlaceLatLng = searchViewModel.toPlaceResult.value?.pos ?: LatLng(0.0, 0.0)
                     val fromPlaceLatLng = searchViewModel.fromPlaceResult.value?.pos ?: LatLng(0.0, 0.0)
 
                     Log.d("PlaceLatLng tag", "$toPlaceLatLng $fromPlaceLatLng")
 
+                    val modes = settingsViewModel.filter.value?.toList() ?: emptyList()
+
                     enturViewModel.loadTrips(
                         start = fromPlaceLatLng,
                         end = toPlaceLatLng,
-                        time = dateTime ?: Calendar.getInstance()
+                        time = dateTime ?: Calendar.getInstance(),
+                        modes = modes
                     )
 
                     settingsViewModel.showTripsData.postValue(true)
@@ -497,6 +608,57 @@ fun TravelSearchbar(
                     settingsViewModel.showDatePicker.postValue(!showDatePicker!!)
                 }
             )
+            Spacer(modifier = Modifier.width(5.dp))
+            IconButton(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colors.background,
+                        shape = RoundedCornerShape(Constants.CORNER_RADIUS + 15.dp)
+                    )
+                    .border(
+                        width = 1.5.dp,
+                        color = MaterialTheme.colors.primary,
+                        shape = RoundedCornerShape(Constants.CORNER_RADIUS + 15.dp)
+                    )
+                    .size(40.dp)
+                ,
+                content = {
+                    Icon(imageVector = Icons.Filled.FilterAlt, contentDescription = "Filter", tint = MaterialTheme.colors.primary)
+                },
+                onClick = {
+                    settingsViewModel.showFilterOptions.postValue(true)
+                },
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.weight(1f)
+            ) {
+                IconButton(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colors.background,
+                            shape = RoundedCornerShape(Constants.CORNER_RADIUS + 15.dp)
+                        )
+                        .border(
+                            width = 1.5.dp,
+                            color = MaterialTheme.colors.primary,
+                            shape = RoundedCornerShape(Constants.CORNER_RADIUS + 15.dp)
+                        )
+                        .size(40.dp)
+                    ,
+                    content = {
+                        Icon(
+                            imageVector = if (showFromSearch == true) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,
+                            contentDescription = "expand or fold",
+                            tint = MaterialTheme.colors.primary
+                        )
+                    },
+                    onClick = {
+                        settingsViewModel.showFromSearch.postValue(!(showFromSearch ?: false))
+                    },
+                )
+            }
         }
 
 

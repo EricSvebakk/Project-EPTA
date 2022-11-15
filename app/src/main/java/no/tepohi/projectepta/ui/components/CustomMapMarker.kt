@@ -21,6 +21,8 @@ fun CustomMapMarker(
     position: LatLng,
     title: String,
     onClick: () -> Unit = { },
+    onInfoWindowClick: () -> Unit = { },
+
     snippet: String? = null,
     @DrawableRes iconResourceId: Int
 ) {
@@ -36,7 +38,10 @@ fun CustomMapMarker(
         onClick = {
             onClick()
             false
-        }
+        },
+        onInfoWindowClick = {
+          onInfoWindowClick()
+        },
     )
 }
 
