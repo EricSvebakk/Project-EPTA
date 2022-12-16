@@ -6,17 +6,15 @@ An alternative to Ruter's map app (requires Google API key!)
 
 ## Showcase
 
+From left to right:
+* Travel screen
+* Result tab
+* Result tab (expanded)
+* Show travel result
+* Departures screen
+* Settings screen
+
 <table>
-  <thead>
-    <tr>
-      <th> Travel screen     </th>
-      <th> Result tab        </th>
-      <th> Result expanded   </th>
-      <th> Show result       </th>
-      <th> Departures screen </th>
-      <th> Settings screen   </th>
-    </tr>
-  </thead>
   <tbody>
     <tr>
       <td><img src="https://user-images.githubusercontent.com/47322476/207990168-4bddb224-1ff2-48c3-a1c0-b5af70999f25.png"/></td>
