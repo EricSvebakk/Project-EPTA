@@ -7,9 +7,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -18,32 +21,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
-import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import no.tepohi.projectepta.R
+import kotlinx.coroutines.delay
 import no.tepohi.projectepta.ui.components.*
-import no.tepohi.projectepta.ui.components.entur.TransportLabel
 import no.tepohi.projectepta.ui.components.entur.TravelResultCard
 import no.tepohi.projectepta.ui.theme.Constants
-import no.tepohi.projectepta.ui.theme.Constants.Companion.allTransports
 import no.tepohi.projectepta.ui.theme.Constants.Companion.gesturesDisabled
 import no.tepohi.projectepta.ui.theme.testColor
 import no.tepohi.projectepta.ui.viewmodels.EnturViewModel
 import no.tepohi.projectepta.ui.viewmodels.SearchViewModel
 import no.tepohi.projectepta.ui.viewmodels.SettingsViewModel
-import java.lang.IllegalStateException
 import java.util.*
 
 @Composable
@@ -52,8 +47,6 @@ fun TravelScreen(
     searchViewModel: SearchViewModel,
     settingsViewModel: SettingsViewModel,
 ) {
-
-    val pl by searchViewModel.polylines.observeAsState()
 
     val cond1 = settingsViewModel.appColorPalette.value == Constants.THEME_DARK
     val cond2 = settingsViewModel.appColorPalette.value == Constants.THEME_SYSTEM && isSystemInDarkTheme()
@@ -68,39 +61,12 @@ fun TravelScreen(
     )
 
     val cameraPosition = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(59.93, 10.74), 12f)
-    }
-
-
-    val idk3 = LatLngBounds.builder()
-
-    if (pl != null) {
-
-        val idk = pl?.map { it.points }
-
-        idk?.forEach { list ->
-            list.forEach { coord ->
-                idk3.include(coord)
-            }
-        }
-
-        LaunchedEffect(key1 = idk3) {
-            CoroutineScope(Dispatchers.Main).launch {
-
-                cameraPosition.animate(
-                    CameraUpdateFactory.newLatLngBounds(idk3.build(), 800, 1400, 0)
-                )
-            }
-        }
-
+        position = CameraPosition.fromLatLngZoom(Constants.MAP_BOUNDS_CENTER, 12f)
     }
 
     val showTripsData by settingsViewModel.showTripsData.observeAsState()
     val showPopUp by settingsViewModel.showPopUpFavouriteStop.observeAsState()
     val showFilterOptions by settingsViewModel.showFilterOptions.observeAsState()
-    val favouriteStops by settingsViewModel.favouriteStops.observeAsState()
-
-    val currentLocation by searchViewModel.currentLocation.observeAsState()
 
     val uiSettings = MapUiSettings(
         rotationGesturesEnabled = false,
@@ -111,9 +77,6 @@ fun TravelScreen(
         zoomGesturesEnabled = showTripsData == false,
         scrollGesturesEnabled = showTripsData == false,
     )
-
-    val context = LocalContext.current
-
 
     Box {
         GoogleMap(
@@ -126,77 +89,23 @@ fun TravelScreen(
             cameraPositionState = cameraPosition,
             uiSettings = uiSettings,
         ) {
-            if (pl != null) {
-                pl!!.forEach { line ->
+            DrawMapRoute(
+                cameraPosition,
+                searchViewModel,
+                settingsViewModel
+            )
 
-                    CustomMapMarker(
-                        context = context,
-                        position = line.points[0],
-                        title = line.text,
-                        iconResourceId = line.startPointIconId
-                    )
-                    Polyline(
-                        points = line.points,
-                        color = line.color,
-                        zIndex = 400f,
-                        visible = true
-                    )
-                }
-
-                CustomMapMarker(
-                    context = context,
-                    position = pl!!.last().points[0],
-                    title = pl!!.last().text,
-                    iconResourceId = R.drawable.icon_map_end_36
-                )
-            }
-
-//            if (currentLocation != null) {
-//                CustomMapMarker(
-//                    context = context,
-//                    position = currentLocation!!,
-//                    title = "YOU!",
-//                    iconResourceId = R.drawable.icon_map_train_36,
-//                    onInfoWindowClick = {
-//                        settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
-//                        searchViewModel.searchTempText.postValue("Your position")
-//                    }
-//                )
-//            }
-
-            var temp: LatLngBounds? = null
-            try {
-                temp = idk3.build()
-            }
-            catch (e: IllegalStateException) {
-                Log.e("$e", "uh nu")
-            }
-
-            if (temp != null) {
-                Polyline(
-                    points = listOf(
-                        temp.southwest,
-                        LatLng(temp.southwest.latitude, temp.northeast.longitude),
-                        temp.northeast,
-                        LatLng(temp.northeast.latitude, temp.southwest.longitude),
-                        temp.southwest,
-                    ),
-                    color = testColor
-                )
-            }
-
-            favouriteStops?.forEach { stop ->
-                CustomMapMarker(
-                    context = context,
-                    position = LatLng(stop?.latitude ?: 0.0, stop?.longitude ?: 0.0),
-                    title = stop?.name ?: "",
-                    iconResourceId = R.drawable.icon_map_end_36,
-                    onInfoWindowClick = {
-                        settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
-                        searchViewModel.searchTempText.postValue(stop?.name)
-                    }
-                )
-            }
+            // draws outer boundary of map
+            Polyline(
+                points = listOf(
+                    Constants.MAP_BOUNDS_SW,
+                    LatLng(Constants.MAP_BOUNDS_SW.latitude, Constants.MAP_BOUNDS_NE.longitude),
+                    Constants.MAP_BOUNDS_NE,
+                    LatLng(Constants.MAP_BOUNDS_NE.latitude, Constants.MAP_BOUNDS_SW.longitude),
+                    Constants.MAP_BOUNDS_SW,
+                ),
+                color = testColor
+            )
         }
 
         Box(
@@ -234,140 +143,17 @@ fun TravelScreen(
         }
 
         if (showPopUp == true) {
-            Popup(
-                alignment = Alignment.Center,
-                properties = PopupProperties(dismissOnBackPress = true),
-                onDismissRequest = {
-                    settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
-                }
-            ) {
-                Card(
-                    elevation = 10.dp,
-                ) {
-                    Row(
-                    modifier = Modifier
-                        .padding(Constants.PADDING_OUTER)
-                    ) {
-                        CustomButton(
-                            content = "from",
-                            onClick = {
-                                searchViewModel.searchFromText.postValue(searchViewModel.searchTempText.value)
-                                settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
-                            }
-                        )
-                        CustomButton(
-                            content = "to",
-                            onClick = {
-                                searchViewModel.searchToText.postValue(searchViewModel.searchTempText.value)
-                                settingsViewModel.showPopUpFavouriteStop.postValue(!showPopUp!!)
-                            }
-                        )
-                    }
-                }
-            }
+            CustomMapMarkerSelector(
+                settingsViewModel = settingsViewModel,
+                searchViewModel = searchViewModel
+            )
         }
 
         if (showFilterOptions == true) {
-            Popup(
-                alignment = Alignment.Center,
-                properties = PopupProperties(dismissOnBackPress = true),
-                onDismissRequest = {
-                    settingsViewModel.showFilterOptions.postValue(!showFilterOptions!!)
-                }
-            ) {
-                Card(
-                    elevation = 10.dp,
-                    modifier = Modifier
-                        .height(220.dp)
-                        .width(280.dp)
-                ) {
-                    Box(
-                        contentAlignment = Alignment.TopEnd,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        IconButton(
-                            content = {
-                                Icon(imageVector = Icons.Filled.Clear, contentDescription = "Clear")
-                            },
-                            onClick = {
-                                settingsViewModel.showFilterOptions.postValue(false)
-                            },
-                            modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS)
-                            )
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        
-                        Text(text = "Select transports:")
-                        Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
-
-                        val filter by settingsViewModel.filter.observeAsState()
-
-                        val sub = allTransports.filter { it.tm != null }
-
-                        listOf(
-                            sub.subList(0, (allTransports.size/2)),
-                            sub.subList((allTransports.size/2), allTransports.size-1)
-                        ).forEach {
-
-                            Row(
-                                modifier = Modifier.border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                            ) {
-                                it.forEach {
-                                    var toggle by remember { mutableStateOf(true) }
-
-                                    TextButton(
-                                        onClick = {
-                                            toggle = !toggle
-                                            val temp = filter?.toMutableSet() ?: mutableSetOf()
-
-                                            if (toggle) {
-                                                temp.add(it.tm!!)
-                                            } else {
-                                                temp.remove(it.tm!!)
-                                            }
-                                            Log.d("filter tag", temp.toString())
-                                            settingsViewModel.filter.postValue(temp)
-                                        },
-                                        modifier = Modifier
-                                            .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
-                                    ) {
-                                        TransportLabel(
-                                            item = it,
-                                            color = if (toggle) it.color else Color.Gray,
-                                            text = it.mode,
-                                            width = 120.dp
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-
-
-                    }
-
-
-//                    Button(
-//                        onClick = { toggle = !toggle },
-//                        colors = ButtonDefaults.buttonColors(
-//                            backgroundColor = Color.Transparent,
-//                            contentColor = Color.Transparent,
-//                        ),
-//                        elevation = null,
-//                        border = BorderStroke(2.dp, testColor),
-//                        contentPadding = PaddingValues(0.dp)
-//                    ) {
-//                    }
-                }
-            }
+            CustomSelectTransport(
+                settingsViewModel = settingsViewModel
+            )
         }
-
-
 
         AnimatedVisibility(
             visible = (showPopUp ?: false) || (showTripsData ?: false) || (showFilterOptions ?: false),
@@ -397,8 +183,8 @@ fun TravelSearchbar(
     val focusRequester1 = remember { FocusRequester() }
     val focusRequester2 = remember { FocusRequester() }
 
-    var searchTextFrom by remember { mutableStateOf("Stortinget") }
-    var searchTextTo by remember { mutableStateOf("Ullevål stadion") }
+    var searchTextFrom by remember { mutableStateOf("") }
+    var searchTextTo by remember { mutableStateOf("") }
 
     val dateTime by settingsViewModel.dateTime.observeAsState()
     val timeString by settingsViewModel.timeString.observeAsState()
@@ -413,6 +199,8 @@ fun TravelSearchbar(
 
     val allStops by enturViewModel.stopsData.observeAsState()
 
+
+    // TODO: fix this shit
     if (!searchViewModel.searchFromText.value.equals("")) {
         searchTextFrom = searchViewModel.searchFromText.value ?: ""
         searchViewModel.searchFromText.postValue("")
@@ -422,6 +210,7 @@ fun TravelSearchbar(
         )
     }
 
+    // TODO: fix this shit
     if (!searchViewModel.searchToText.value.equals("")) {
         searchTextTo = searchViewModel.searchToText.value ?: ""
         searchViewModel.searchToText.postValue("")
@@ -469,6 +258,7 @@ fun TravelSearchbar(
 //            contentAlignment = Alignment.CenterEnd
         ) {
 
+            // TODO: extract to separate composable function
             AnimatedVisibility(
                 visible = showFromSearch == true,
                 enter = expandVertically(expandFrom = Alignment.Top),
@@ -558,6 +348,8 @@ fun TravelSearchbar(
 
         }
         Spacer(modifier = Modifier.height(5.dp))
+
+        // TODO: perhaps extract?
         Row {
             IconButton(
                 modifier = Modifier
@@ -577,21 +369,14 @@ fun TravelSearchbar(
                 },
                 onClick = {
 
-                    val toPlaceLatLng = searchViewModel.toPlaceResult.value?.pos ?: LatLng(0.0, 0.0)
-                    val fromPlaceLatLng = searchViewModel.fromPlaceResult.value?.pos ?: LatLng(0.0, 0.0)
+                    Log.d("temp dateTime tag", timeString.toString())
 
-                    Log.d("PlaceLatLng tag", "$toPlaceLatLng $fromPlaceLatLng")
-
-                    val modes = settingsViewModel.filter.value?.toList() ?: emptyList()
-
-                    enturViewModel.loadTrips(
-                        start = fromPlaceLatLng,
-                        end = toPlaceLatLng,
-                        time = dateTime ?: Calendar.getInstance(),
-                        modes = modes
+                    queryResult(
+                        enturViewModel,
+                        settingsViewModel,
+                        searchViewModel,
+                        dateTime
                     )
-
-                    settingsViewModel.showTripsData.postValue(true)
                 },
             )
             Spacer(modifier = Modifier.width(5.dp))
@@ -665,6 +450,38 @@ fun TravelSearchbar(
     }
 }
 
+// TODO: move to folder "methods"
+fun queryResult(
+    enturViewModel: EnturViewModel,
+    settingsViewModel: SettingsViewModel,
+    searchViewModel: SearchViewModel,
+    dateTime: Calendar?,
+//    numTrips: Int
+) {
+
+//    val dateTime = settingsViewModel.dateTime.value
+
+    val numTrips = settingsViewModel.numTrips.value
+
+    val toPlaceLatLng = searchViewModel.toPlaceResult.value?.pos ?: LatLng(0.0, 0.0)
+    val fromPlaceLatLng = searchViewModel.fromPlaceResult.value?.pos ?: LatLng(0.0, 0.0)
+
+    Log.d("PlaceLatLng tag", "$toPlaceLatLng $fromPlaceLatLng")
+
+    val modes = settingsViewModel.filter.value?.toList() ?: emptyList()
+
+    enturViewModel.loadTrips(
+        start = fromPlaceLatLng,
+        end = toPlaceLatLng,
+        time = dateTime ?: Calendar.getInstance(),
+        modes = modes,
+        numTrips = numTrips ?: 0
+    )
+
+    settingsViewModel.showTripsData.postValue(true)
+
+}
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TravelSearchResults(
@@ -733,18 +550,61 @@ fun TravelSearchResults(
         if (trips != null) {
             Log.d("trips!!!", "$trips")
 
-            LazyColumn {
-
-                items(trips!!) { tripPattern ->
-                    Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
-                    //                    CustomResultCard(tripPattern = tripPattern)
-                    TravelResultCard(
-                        tripPattern = tripPattern,
-                        searchViewModel = searchViewModel,
-                        settingsViewModel = settingsViewModel
-                    )
+            var refreshing by remember { mutableStateOf(false) }
+            LaunchedEffect(key1 = refreshing) {
+                if (refreshing) {
+                    delay(3000)
+                    refreshing = false
                 }
             }
+
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing = refreshing),
+                onRefresh = {
+                    refreshing = true
+
+                    queryResult(
+                        enturViewModel,
+                        settingsViewModel,
+                        searchViewModel,
+                        Calendar.getInstance()
+                    )
+                }
+            ) {
+
+                LazyColumn {
+
+                    itemsIndexed(trips!!) { index, tripPattern ->
+
+                        if (index == (trips!!.size -1)) {
+                            settingsViewModel.numTrips.postValue(
+                                settingsViewModel.numTrips.value!! + 5
+                            )
+
+                            Log.d("expanding tag", "YAY!!!")
+
+                            val dateTime = settingsViewModel.dateTime.value
+
+                            queryResult(
+                                enturViewModel,
+                                settingsViewModel,
+                                searchViewModel,
+                                dateTime ?: Calendar.getInstance()
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(Constants.PADDING_INNER))
+                        //                    CustomResultCard(tripPattern = tripPattern)
+                        TravelResultCard(
+                            tripPattern = tripPattern,
+                            searchViewModel = searchViewModel,
+                            settingsViewModel = settingsViewModel
+                        )
+                    }
+                }
+
+            }
+
         }
     }
 

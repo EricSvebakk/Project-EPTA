@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,6 +36,8 @@ class SearchViewModel : ViewModel() {
 
     // for drawing paths on map
     val polylines = MutableLiveData<ArrayList<polyline>>()
+    val polyBounds = MutableLiveData<LatLngBounds>()
+//    val coordPoints = MutableLiveData<ArrayList<LatLng>>()
 
     /**
      * Predicts a list of searchResults based on query-string using autocompleteSource

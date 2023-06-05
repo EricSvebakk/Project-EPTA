@@ -97,6 +97,7 @@ fun CustomDatePicker(
             )
 
             Row(
+                horizontalArrangement = Arrangement.End,
                 modifier = Modifier
                     .padding(Constants.PADDING_OUTER)
                     .border(2.dp, testColor, RoundedCornerShape(Constants.CORNER_RADIUS))
@@ -110,6 +111,22 @@ fun CustomDatePicker(
                     colors = ButtonDefaults.textButtonColors(),
                     elevation = null,
                 ) { Text(text = "Cancel") }
+
+                Button(
+                    onClick = {
+                        onDateSelected(
+                            Calendar.getInstance().apply {
+                                set(Calendar.HOUR_OF_DAY, dateShown.get(Calendar.HOUR_OF_DAY))
+                                set(Calendar.MINUTE, dateShown.get(Calendar.MINUTE))
+                            }
+                        )
+                        onDismissRequest()
+                    },
+                    colors = ButtonDefaults.textButtonColors(),
+                    elevation = null
+                ) {
+                    Text(text = "today")
+                }
 
                 Button(
                     modifier = Modifier

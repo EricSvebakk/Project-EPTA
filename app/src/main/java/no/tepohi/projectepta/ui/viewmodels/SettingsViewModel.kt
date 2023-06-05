@@ -1,7 +1,15 @@
 package no.tepohi.projectepta.ui.viewmodels
 
+import android.util.Log
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.rememberCameraPositionState
 import no.tepohi.example.StopPlacesByBoundaryQuery
 import no.tepohi.example.type.TransportMode
 import no.tepohi.projectepta.ui.theme.Constants
@@ -35,6 +43,9 @@ class SettingsViewModel: ViewModel() {
     val filter = MutableLiveData(allTransports.filter { it.tm != null }.map { it.tm }.toSet())
 
     val showFromSearch = MutableLiveData(true)
+
+    val numTrips = MutableLiveData(12)
+
 
     fun resetDateTime() {
         println(dateTime.value)
@@ -77,10 +88,10 @@ class SettingsViewModel: ViewModel() {
 
         dateTime.postValue(cal)
 
-
         val hoy = timeFormat.format(dateTime.value!!.time)
         timeString.postValue(hoy)
-            .also { println("updateTime: $it") }
+
+        Log.d("updateTime tag", "${timeString.value}")
     }
 
 }

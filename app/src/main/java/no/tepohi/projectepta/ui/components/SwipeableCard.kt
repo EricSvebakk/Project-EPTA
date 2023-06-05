@@ -127,7 +127,7 @@ fun DraggableCard(
         transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
         targetValueByState = {
             if (isRevealed)
-                MaterialTheme.colors.surface
+                MaterialTheme.colors.primary
             else
                 MaterialTheme.colors.primary
         }
@@ -137,7 +137,7 @@ fun DraggableCard(
         transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
         targetValueByState = {
             if (isRevealed)
-                MaterialTheme.colors.onSurface
+                MaterialTheme.colors.onPrimary
             else
                 MaterialTheme.colors.onPrimary
         }

@@ -7,6 +7,7 @@ query FindTripQuery(
   $accessMode: StreetMode,
   $egressMode: StreetMode,
   $transportModes: [TransportModes],
+  $numTrips: Int!
 ) {
   trip(
     from: {
@@ -21,7 +22,7 @@ query FindTripQuery(
         longitude: $toLon
       }
     }
-    numTripPatterns: 12
+    numTripPatterns: $numTrips
     dateTime: $date
     modes: {
       accessMode: $accessMode,

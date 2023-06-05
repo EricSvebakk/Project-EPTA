@@ -50,7 +50,8 @@ class EnturDataSource {
         fromLatLng: LatLng,
         toLatLng: LatLng,
         time: String,
-        modes: List<TransportMode?>? = null
+        modes: List<TransportMode?>? = null,
+        numTrips: Int = 12
     ): List<FindTripQuery.TripPattern> {
 
         val tm = modes?.map { TransportModes(Optional.presentIfNotNull(it)) }
@@ -64,7 +65,8 @@ class EnturDataSource {
                 date = time,
                 accessMode = StreetMode.flexible,
                 egressMode = StreetMode.flexible,
-                transportModes = tm
+                transportModes = tm,
+                numTrips = numTrips
             )
 
             Log.d("fetchTrips tag", query.toString())

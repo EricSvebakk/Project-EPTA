@@ -44,7 +44,8 @@ class EnturViewModel: ViewModel() {
         start: LatLng,
         end: LatLng,
         modes: List<TransportMode?>,
-        time: Calendar = Calendar.getInstance()
+        time: Calendar = Calendar.getInstance(),
+        numTrips: Int = 12,
     ) {
         val timeString = SimpleDateFormat("yyyy-MM-dd\'T\'HH:mm:ssXXX", Locale.getDefault()).format(time.time)
 
@@ -97,7 +98,8 @@ class EnturViewModel: ViewModel() {
                 fromLatLng = start, // LatLng(startClosest.latitude!!, startClosest.longitude!!),
                 toLatLng = end, // LatLng(endClosest.latitude!!, endClosest.longitude!!),
                 time = timeString,
-                modes = modes
+                modes = modes,
+                numTrips = numTrips
 //                    startClosest.name, endClosest.name, timeString
             ).also {
                 tripsData.postValue(it)

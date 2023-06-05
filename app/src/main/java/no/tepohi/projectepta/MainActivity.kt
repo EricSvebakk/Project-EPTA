@@ -16,6 +16,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
     private val searchViewModel: SearchViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
 
-    private var currentLocation: StopPlacesByBoundaryQuery.StopPlacesByBbox? = null
+//    private var currentLocation: StopPlacesByBoundaryQuery.StopPlacesByBbox? = null
     private lateinit var locationManager: LocationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,10 +46,13 @@ class MainActivity : ComponentActivity() {
 
         val hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
 
+        // app has permission
         if (hasPermission == PERMISSION_GRANTED) {
             Log.d("LOCATION tag", "ALREADY GRANTED")
             getCurrentLocation()
         }
+
+        // app does not have permission (yet)
         else {
             Log.d("LOCATION tag", "NOT GRANTED")
 
@@ -82,47 +86,60 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            val favStops by settingsViewModel.favouriteStops.observeAsState()
-            val currentPosition by searchViewModel.currentLocation.observeAsState()
+            val currentLocation by searchViewModel.currentLocation.observeAsState()
             val allStops by enturViewModel.stopsData.observeAsState()
 
-
-            if (favStops != null && currentLocation != currentPosition) {
-                val lat = currentLocation?.latitude ?: 0.0
-                val lon = currentLocation?.longitude ?: 0.0
-
-                val result = StopPlacesByBoundaryQuery.StopPlacesByBbox(
-                    "Your position",
-                    "boobs",
-                    lat,
-                    lon,
-                )
-
-                val copyFavs = favStops!!.toMutableList()
-
-                copyFavs.remove(currentPosition)
-                copyFavs.add(result)
-                settingsViewModel.favouriteStops.postValue(copyFavs)
-                searchViewModel.currentLocation.postValue(currentLocation)
-
-                if (allStops != null) {
+            LaunchedEffect(
+                key1 = currentLocation != null,
+                key2 = allStops != null
+            ) {
+                if (allStops != null && currentLocation != null) {
                     val copyAll = allStops!!.toMutableList()
-                    copyAll.remove(currentPosition)
-                    copyAll.add(result)
+                    copyAll.add(currentLocation)
                     enturViewModel.stopsData.postValue(copyAll)
+
+                    Log.d("LOCATION ADDED", "CURRENT POSITION ADDED TO STOPS.")
                 }
-
-                Log.d("LOCATION add SUCCESS tag", "location added! ")
-            }
-            else {
-                Log.d("LOCATION add ERROR tag", "unable to add position to map")
             }
 
-            val acp by settingsViewModel.appColorPalette.observeAsState()
+//            LaunchedEffect(
+//                key1 = currentLocation
+//            ) {
+//
+//                // add current location to favourites
+//                if (allStops != null && currentLocation != null) {
+//
+//                    val lat = currentLocation?.latitude ?: 0.0
+//                    val lon = currentLocation?.longitude ?: 0.0
+//
+//                    val result = StopPlacesByBoundaryQuery.StopPlacesByBbox(
+//                        "current position",
+//                        "cur_pos",
+//                        lat,
+//                        lon,
+//                    )
+//
+//                    val copyAll = allStops!!.toMutableList()
+//
+//                    copyAll.remove(currentLocation)
+//                    copyAll.add(result)
+//
+//                    enturViewModel.stopsData.postValue(copyAll)
+//                    searchViewModel.currentLocation.postValue(currentLocation)
+//
+//                    Log.d("LOCATION add SUCCESS tag", "location added! ")
+//                }
+//                else {
+//                    Log.d("LOCATION add ERROR tag", "unable to add position to map ($currentLocation $allStops)")
+//                }
+//            }
 
+
+            val appColorPalette by settingsViewModel.appColorPalette.observeAsState()
             val navController = rememberNavController()
+
             EptaTheme(
-                colorPalette = acp ?: Constants.THEME_SYSTEM
+                colorPalette = appColorPalette ?: Constants.THEME_SYSTEM
             ) {
 
                 Scaffold(
@@ -173,12 +190,17 @@ class MainActivity : ComponentActivity() {
 
                 Log.d("LOCATION result tag", "$lat $lon")
 
-                currentLocation = StopPlacesByBoundaryQuery.StopPlacesByBbox(
-                    "Your position",
-                    "boobs",
+                val currentLocation = StopPlacesByBoundaryQuery.StopPlacesByBbox(
+                    "current position",
+                    "cur_por",
                     lat,
                     lon,
                 )
+
+                searchViewModel.currentLocation.postValue(currentLocation)
+
+//                val allStops = enturViewModel.stopsData.value?.toMutableList() ?: mutableListOf()
+//                allStops.add(currentLocation)
 
 //                val stops = settingsViewModel.favouriteStops.value
 //

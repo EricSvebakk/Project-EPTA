@@ -147,6 +147,7 @@ dependencies {
     // Integration with activities
     // implementation 'androidx.activity:activity-compose:1.4.0'
 
+    implementation 'com.google.accompanist:accompanist-swiperefresh:0.24.13-rc'
 }
 
 apollo {

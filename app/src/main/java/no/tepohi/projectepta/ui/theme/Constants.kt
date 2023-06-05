@@ -74,6 +74,10 @@ interface Constants {
 
         val MAP_BOUNDS_SW = LatLng(59.809, 10.456)
         val MAP_BOUNDS_NE = LatLng(60.136, 10.954)
+        val MAP_BOUNDS_CENTER = LatLng(
+            (MAP_BOUNDS_NE.latitude + MAP_BOUNDS_SW.latitude) / 2,
+            (MAP_BOUNDS_NE.longitude + MAP_BOUNDS_SW.longitude) / 2
+        )
 
         const val THEME_LIGHT = "Light theme"
         const val THEME_DARK = "Dark theme"
